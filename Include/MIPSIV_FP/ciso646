@@ -1,0 +1,27 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+/*
+ ciso646 standard header
+*/
+
+#if     _MSC_VER > 1000
+#pragma once
+#endif
+
+#ifndef _CISO646_
+#define _CISO646_
+#include <iso646.h>
+#endif /* _CISO646_ */
+
+/*
+ * Copyright (c) 1994 by P.J. Plauger.  ALL RIGHTS RESERVED. 
+ * Consult your license regarding permissions and restrictions.
+ */

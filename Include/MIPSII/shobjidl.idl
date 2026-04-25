@@ -1,0 +1,1307 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+//+-------------------------------------------------------------------------
+//
+//  File: shobjidl.idl
+//
+//  Contents: This interface definition contains shell objects that can be remoted
+//
+//
+//--------------------------------------------------------------------------
+
+
+
+import "objidl.idl";
+import "oleidl.idl";
+import "oaidl.idl";
+import "shtypes.idl";
+import "servprov.idl";
+
+cpp_quote("#ifndef _WINRESRC_")
+cpp_quote("#ifndef _WIN32_IE")
+cpp_quote("#define _WIN32_IE 0x0501")
+cpp_quote("#else")
+cpp_quote("#if (_WIN32_IE < 0x0400) && defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0500)")
+cpp_quote("#error _WIN32_IE setting conflicts with _WIN32_WINNT setting")
+cpp_quote("#endif")
+cpp_quote("#endif")
+cpp_quote("#endif")
+
+cpp_quote("//===========================================================================")
+cpp_quote("//")
+cpp_quote("// IPersistFolder Interface")
+cpp_quote("//")
+cpp_quote("//  The IPersistFolder interface is used by the file system implementation of")
+cpp_quote("// IShellFolder::BindToObject when it is initializing a shell folder object.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// [Member functions]")
+cpp_quote("//")
+cpp_quote("// IPersistFolder::Initialize")
+cpp_quote("//")
+cpp_quote("//  This member function is called when the explorer is initializing a")
+cpp_quote("// shell folder object.")
+cpp_quote("//")
+cpp_quote("//  Parameters:")
+cpp_quote("//   pidl -- Specifies the absolute location of the folder.")
+cpp_quote("//")
+cpp_quote("//===========================================================================")
+
+// IPersistFolder
+[
+    object,
+    uuid(000214EA-0000-0000-C000-000000000046),  // IID_IPersistFolder
+    pointer_default(unique),
+]
+
+interface IPersistFolder : IPersist
+{
+    
+    HRESULT Initialize([in] LPCITEMIDLIST pidl);
+};
+
+typedef IPersistFolder *LPPERSISTFOLDER;
+
+cpp_quote("#if (_WIN32_IE >= 0x0400)")
+
+// IPersistFolder2
+[
+    object,
+    uuid(1AC3D9F0-175C-11d1-95BE-00609797EA4F),  // IID_IPersistFolder2
+    pointer_default(unique),
+]
+
+interface IPersistFolder2 : IPersistFolder
+{
+    
+    HRESULT GetCurFolder([out] LPITEMIDLIST *ppidl);
+};
+
+typedef IPersistFolder2 *LPPERSISTFOLDER2;
+
+cpp_quote("#endif")
+
+[
+    object,
+    uuid(1079acfc-29bd-11d3-8e0d-00c04f6837d5),  // IID_IPersistIDList
+    pointer_default(unique),
+]
+interface IPersistIDList : IPersist
+{
+    HRESULT LoadIDList([in] LPCITEMIDLIST pidl);
+    HRESULT SaveIDList([out] LPITEMIDLIST *ppidl);
+};
+    
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// IEnumIDList interface")
+cpp_quote("//")
+cpp_quote("//  IShellFolder::EnumObjects member returns an IEnumIDList object.")
+cpp_quote("//")
+cpp_quote("//-------------------------------------------------------------------------")
+interface IEnumIDList;
+[
+    helpstring("IEnumIDList "),
+    uuid(000214F2-0000-0000-C000-000000000046),
+    object,
+    pointer_default(unique)
+]
+
+interface IEnumIDList : IUnknown
+{
+    HRESULT Next(
+        [in] ULONG celt,
+        [out, size_is(celt), length_is(*pceltFetched)] LPITEMIDLIST *rgelt,
+        [out] ULONG *pceltFetched);
+        
+    HRESULT Skip([in] ULONG celt);
+    HRESULT Reset();
+    HRESULT Clone([out] IEnumIDList **ppenum);
+};
+
+typedef IEnumIDList *LPENUMIDLIST;
+
+
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// IShellFolder interface")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// [Member functions]")
+cpp_quote("//")
+cpp_quote("// IShellFolder::BindToObject(pidl, pbc, riid, ppv)")
+cpp_quote("//   This function returns an instance of a sub-folder which is specified")
+cpp_quote("//  by the IDList (pidl).")
+cpp_quote("//")
+cpp_quote("// IShellFolder::BindToStorage(pidl, pbc, riid, ppv)")
+cpp_quote("//   This function returns a storage instance of a sub-folder which is")
+cpp_quote("//  specified by the IDList (pidl). The shell never calls this member")
+cpp_quote("//  function in the first release of Win95.")
+cpp_quote("//")
+cpp_quote("// IShellFolder::CompareIDs(lParam, pidl1, pidl2)")
+cpp_quote("//   This function compares two IDLists and returns the result. The shell")
+cpp_quote("//  explorer always passes 0 as lParam, which indicates 'sort by name'.")
+cpp_quote("//  It should return 0 (as CODE of the scode), if two id indicates the")
+cpp_quote("//  same object; negative value if pidl1 should be placed before pidl2;")
+cpp_quote("//  positive value if pidl2 should be placed before pidl1.")
+cpp_quote("//")
+cpp_quote("// IShellFolder::CreateViewObject(hwndOwner, riid, ppv)")
+cpp_quote("//   This function creates a view object of the folder itself. The view")
+cpp_quote("//  object is a difference instance from the shell folder object.")
+cpp_quote("//   'hwndOwner' can be used  as the owner window of its dialog box or")
+cpp_quote("//  menu during the lifetime of the view object.")
+cpp_quote("//  This member function should always create a new   ;Internal")
+cpp_quote("//  instance which has only one reference count. The explorer may create")
+cpp_quote("//  more than one instances of view object from one shell folder object")
+cpp_quote("//  and treat them as separate instances.")
+cpp_quote("//")
+cpp_quote("// IShellFolder::GetAttributesOf(cidl, apidl, prgfInOut)")
+cpp_quote("//   This function returns the attributes of specified objects in that")
+cpp_quote("//  folder. 'cidl' and 'apidl' specifies objects. 'apidl' contains only")
+cpp_quote("//  simple IDLists. The explorer initializes *prgfInOut with a set of")
+cpp_quote("//  flags to be evaluated. The shell folder may optimize the operation")
+cpp_quote("//  by not returning unspecified flags.")
+cpp_quote("//")
+cpp_quote("// IShellFolder::GetUIObjectOf(hwndOwner, cidl, apidl, riid, prgfInOut, ppv)")
+cpp_quote("//   This function creates a UI object to be used for specified objects.")
+cpp_quote("//  The shell explorer passes either IID_IDataObject (for transfer operation)")
+cpp_quote("//  or IID_IContextMenu (for context menu operation) as riid.")
+cpp_quote("//")
+cpp_quote("// IShellFolder::GetDisplayNameOf")
+cpp_quote("//   This function returns the display name of the specified object.")
+cpp_quote("//  If the ID contains the display name (in the locale character set),")
+cpp_quote("//  it returns the offset to the name. Otherwise, it returns a pointer")
+cpp_quote("//  to the display name string (UNICODE), which is allocated by the")
+cpp_quote("//  task allocator, or fills in a buffer.")
+cpp_quote("//")
+cpp_quote("// IShellFolder::SetNameOf")
+cpp_quote("//   This function sets the display name of the specified object.")
+cpp_quote("//  If it changes the ID as well, it returns the new ID which is")
+cpp_quote("//  alocated by the task allocator.")
+cpp_quote("//")
+cpp_quote("//-------------------------------------------------------------------------")
+
+cpp_quote("// IShellFolder::GetDisplayNameOf/SetNameOf uFlags")                                      
+cpp_quote("typedef enum tagSHGDN")
+cpp_quote("{")
+cpp_quote("    SHGDN_NORMAL             = 0x0000,  // default (display purpose)")
+cpp_quote("    SHGDN_INFOLDER           = 0x0001,  // displayed under a folder (relative)")
+cpp_quote("    SHGDN_NOFRAGMENT         = 0x0002,  // URL without location")
+cpp_quote("    SHGDN_FOREDITING         = 0x1000,  // for in-place editing")
+cpp_quote("    SHGDN_FORADDRESSBAR      = 0x4000,  // UI friendly parsing name (remove ugly stuff)")
+cpp_quote("    SHGDN_FORPARSING         = 0x8000,  // parsing name for ParseDisplayName()")
+cpp_quote("} SHGNO;")
+
+typedef DWORD SHGDNF;
+
+cpp_quote("// IShellFolder::EnumObjects grfFlags bits")
+cpp_quote("typedef enum tagSHCONTF")
+cpp_quote("{")
+cpp_quote("    SHCONTF_FOLDERS             = 0x0020,   // only want folders enumerated (SHGAO_FOLDER)")
+cpp_quote("    SHCONTF_NONFOLDERS          = 0x0040,   // include non folders")
+cpp_quote("    SHCONTF_INCLUDEHIDDEN       = 0x0080,   // show items normally hidden")
+cpp_quote("    SHCONTF_INIT_ON_FIRST_NEXT  = 0x0100,   // allow EnumObject() to return before validating enum")
+cpp_quote("    SHCONTF_NETPRINTERSRCH      = 0x0200,   // hint that client is looking for printers")
+cpp_quote("    SHCONTF_SHAREABLE           = 0x0400,   // hint that client is looking sharable resources (remote shares)")
+cpp_quote("};")
+typedef DWORD SHCONTF;
+
+cpp_quote("// IShellFolder::CompareIDs lParam flags")
+cpp_quote("//")
+cpp_quote("//  SHCIDS_ALLFIELDS is a mask for lParam indicating that the shell folder")
+cpp_quote("//  should first compare on the lParam column, and if that proves equal,")
+cpp_quote("//  then perform a full comparison on all fields.  This flag is supported")
+cpp_quote("//  if the IShellFolder supports IShellFolder2.")
+cpp_quote("//")
+cpp_quote("//  If you add more flags in the future, you need to enhance the return")
+cpp_quote("//  value from SFVM_SUPPORTSIDENTITY.")
+cpp_quote("//")
+
+cpp_quote("#define SHCIDS_ALLFIELDS        0x80000000L")
+cpp_quote("#define SHCIDS_COLUMNMASK       0x0000FFFFL")
+
+cpp_quote("// IShellFolder::GetAttributesOf flags")
+cpp_quote("// DESCRIPTION:")
+cpp_quote("// SFGAO_CANLINK: If this bit is set on an item in the shell folder, a")
+cpp_quote("//            'Create Shortcut' menu item will be added to the File")
+cpp_quote("//            menu and context menus for the item.  If the user selects")
+cpp_quote("//            that command, your IContextMenu::InvokeCommand() will be called")
+cpp_quote("//            with 'link'.")
+cpp_quote("//            	 That flag will also be used to determine if 'Create Shortcut'")
+cpp_quote("//            should be added when the item in your folder is dragged to another")
+cpp_quote("//            folder.")
+cpp_quote("#define SFGAO_CANCOPY           DROPEFFECT_COPY // Objects can be copied    (0x1)")
+cpp_quote("#define SFGAO_CANMOVE           DROPEFFECT_MOVE // Objects can be moved     (0x2)")
+cpp_quote("#define SFGAO_CANLINK           DROPEFFECT_LINK // Objects can be linked    (0x4)")
+cpp_quote("#define SFGAO_CANRENAME         0x00000010L     // Objects can be renamed")
+cpp_quote("#define SFGAO_CANDELETE         0x00000020L     // Objects can be deleted")
+cpp_quote("#define SFGAO_HASPROPSHEET      0x00000040L     // Objects have property sheets")
+cpp_quote("#define SFGAO_DROPTARGET        0x00000100L     // Objects are drop target")
+cpp_quote("#define SFGAO_CAPABILITYMASK    0x00000177L")
+cpp_quote("#define SFGAO_LINK              0x00010000L     // Shortcut (link)")
+cpp_quote("#define SFGAO_SHARE             0x00020000L     // shared")
+cpp_quote("#define SFGAO_READONLY          0x00040000L     // read-only")
+cpp_quote("#define SFGAO_GHOSTED           0x00080000L     // ghosted icon")
+cpp_quote("#define SFGAO_HIDDEN            0x00080000L     // hidden object")
+cpp_quote("#define SFGAO_DISPLAYATTRMASK   0x000F0000L")
+cpp_quote("#define SFGAO_FILESYSANCESTOR   0x10000000L     // It contains file system folder")
+cpp_quote("#define SFGAO_FOLDER            0x20000000L     // It's a folder.")
+cpp_quote("#define SFGAO_FILESYSTEM        0x40000000L     // is a file system thing (file/folder/root)")
+cpp_quote("#define SFGAO_HASSUBFOLDER      0x80000000L     // Expandable in the map pane")
+cpp_quote("#define SFGAO_CONTENTSMASK      0x80000000L")
+cpp_quote("#define SFGAO_VALIDATE          0x01000000L     // invalidate cached information")
+cpp_quote("#define SFGAO_REMOVABLE         0x02000000L     // is this removeable media?")
+cpp_quote("#define SFGAO_COMPRESSED        0x04000000L     // Object is compressed (use alt color)")
+cpp_quote("#define SFGAO_BROWSABLE         0x08000000L     // is in-place browsable")
+cpp_quote("#define SFGAO_NONENUMERATED     0x00100000L     // is a non-enumerated object")
+cpp_quote("#define SFGAO_NEWCONTENT        0x00200000L     // should show bold in explorer tree")
+cpp_quote("#define SFGAO_CANMONIKER        0x00400000L     // can create monikers for its objects")
+
+typedef ULONG SFGAOF;
+
+cpp_quote("// IShellFolder IBindCtx* parameters. the IUnknown for these are")
+cpp_quote("// accessed through IBindCtx::RegisterObjectParam/GetObjectParam")
+cpp_quote("")
+cpp_quote("// this object will support IPersist to query a CLSID that should be skipped")
+cpp_quote("// in the binding process. this is to avoid loops or to allow delegation to")
+cpp_quote("// base name space functionality. see SHSkipJunction()")
+cpp_quote("")
+cpp_quote("#define STR_SKIP_BINDING_CLSID      L\"Skip Binding CLSID\"")
+
+interface IShellFolder;
+[
+    helpstring("IShellFolder"),
+    uuid(000214E6-0000-0000-C000-000000000046),
+    object,
+    local,
+    pointer_default(unique)
+]
+
+interface IShellFolder : IUnknown
+{
+    HRESULT ParseDisplayName(
+        [in] HWND hwnd, 
+        [in] LPBC pbc, 
+        [in, string] LPOLESTR pszDisplayName,
+        [out] ULONG *pchEaten, 
+        [out] LPITEMIDLIST *ppidl, 
+        [in, out] ULONG *pdwAttributes);
+
+    HRESULT EnumObjects(
+        [in] HWND hwnd, 
+        [in] SHCONTF grfFlags, 
+        [out] IEnumIDList **ppenumIDList);
+
+    HRESULT BindToObject(
+        [in] LPCITEMIDLIST pidl, 
+        [in] LPBC pbc, 
+        [in] REFIID riid, 
+        [out, iid_is(riid)] void **ppv);
+        
+    HRESULT BindToStorage(
+        [in] LPCITEMIDLIST pidl, 
+        [in] LPBC pbc, 
+        [in] REFIID riid, 
+        [out, iid_is(riid)] void **ppv);
+        
+    HRESULT CompareIDs(
+        [in] LPARAM lParam, 
+        [in] LPCITEMIDLIST pidl1, 
+        [in] LPCITEMIDLIST pidl2);
+    
+    HRESULT CreateViewObject(
+        [in] HWND hwndOwner, 
+        [in] REFIID riid, 
+        [out, iid_is(riid)] void **ppv);
+
+    HRESULT GetAttributesOf(
+        [in] UINT cidl, 
+        [in, size_is(cidl)] LPCITEMIDLIST * apidl, 
+        [in, out] SFGAOF * rgfInOut);
+
+    HRESULT GetUIObjectOf(
+        [in] HWND hwndOwner, 
+        [in] UINT cidl, 
+        [in, size_is(cidl)] LPCITEMIDLIST * apidl,
+        [in] REFIID riid, 
+        UINT * rgfReserved,
+        [out, iid_is(riid)] void **ppv);
+
+    HRESULT GetDisplayNameOf(
+        [in] LPCITEMIDLIST pidl, 
+        [in] SHGDNF uFlags, 
+        [out] LPSTRRET lpName);
+
+    HRESULT SetNameOf(
+        [in] HWND hwnd, 
+        [in] LPCITEMIDLIST pidl, 
+        [in, string] LPCOLESTR pszName, 
+        [in] SHGDNF uFlags, 
+        [out] LPITEMIDLIST *ppidlOut);
+};
+
+typedef IShellFolder * LPSHELLFOLDER;
+
+
+cpp_quote("#if (_WIN32_IE >= 0x0500)")
+
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// IEnumExtraSearch interface")
+cpp_quote("//")
+cpp_quote("//  IShellFolder2::EnumSearches member returns an IEnumExtraSearch object.")
+cpp_quote("//")
+cpp_quote("//-------------------------------------------------------------------------")
+
+typedef struct tagEXTRASEARCH
+{
+    GUID    guidSearch;
+    WCHAR   wszFriendlyName[80];
+    WCHAR   wszUrl[2084];
+}EXTRASEARCH, *LPEXTRASEARCH;
+
+typedef struct IEnumExtraSearch *LPENUMEXTRASEARCH;
+
+interface IShellFolder2;
+[
+    helpstring("IShellFolder"),
+    uuid(0E700BE1-9DB6-11d1-A1CE-00C04FD75D13),
+    object,
+    pointer_default(unique)
+]
+interface IEnumExtraSearch : IUnknown
+{
+    HRESULT Next(
+        [in] ULONG celt,
+        [out, size_is(celt), length_is(*pceltFetched)] EXTRASEARCH *rgelt,
+        [out] ULONG *pceltFetched);
+
+    HRESULT Skip([in] ULONG celt);
+    HRESULT Reset();
+    HRESULT Clone([out] IEnumExtraSearch **ppenum);
+};
+
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("// IShellFolder2")
+cpp_quote("//")
+cpp_quote("// [member functions]")
+cpp_quote("//")
+cpp_quote("// IShellFolder2::GetDefaultSearchGUID(LPGUID pGuid)")
+cpp_quote("//   Returns the guid of the search that is to be invoked when user clicks ")
+cpp_quote("//   on the search toolbar button")
+cpp_quote("//")
+cpp_quote("// IShellFolder2::EnumSearches(IEnumExtraSearch **ppenum)")
+cpp_quote("//   gives an enumerator of the searches to be added to the search menu")
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// IShellFolder2::GetDefaultColumnState values")
+
+typedef [v1_enum] enum {
+    SHCOLSTATE_TYPE_STR     = 0x00000001,
+    SHCOLSTATE_TYPE_INT     = 0x00000002,
+    SHCOLSTATE_TYPE_DATE    = 0x00000003,
+    SHCOLSTATE_TYPEMASK     = 0x0000000F,
+    SHCOLSTATE_ONBYDEFAULT  = 0x00000010,   // should on by default in details view
+    SHCOLSTATE_SLOW         = 0x00000020,   // will be slow to compute, do on a background thread
+    SHCOLSTATE_EXTENDED     = 0x00000040,   // provided by a handler, not the folder
+    SHCOLSTATE_SECONDARYUI  = 0x00000080,   // not displayed in context menu, but listed in the "More..." dialog
+    SHCOLSTATE_HIDDEN       = 0x00000100,   // not displayed in the UI
+} SHCOLSTATE;
+
+typedef DWORD SHCOLSTATEF; 
+
+typedef struct {
+    GUID fmtid;
+    DWORD pid;
+} SHCOLUMNID, *LPSHCOLUMNID;
+typedef const SHCOLUMNID* LPCSHCOLUMNID;
+
+interface IShellFolder2;
+[
+    helpstring("IShellFolder2"),
+    uuid(93F2F68C-1D1B-11d3-A30E-00C04F79ABD1),
+    object,
+    local,
+    pointer_default(unique)
+]
+interface IShellFolder2 : IShellFolder
+{
+    HRESULT GetDefaultSearchGUID([out] GUID *pguid);
+    
+    HRESULT EnumSearches([out] IEnumExtraSearch **ppenum);
+    
+    HRESULT GetDefaultColumn(
+        DWORD dwRes, 
+        [out] ULONG *pSort, 
+        [out] ULONG *pDisplay);
+        
+    HRESULT GetDefaultColumnState(
+        [in] UINT iColumn, 
+        [out] SHCOLSTATEF *pcsFlags);
+        
+    HRESULT GetDetailsEx(
+        [in]LPCITEMIDLIST pidl, 
+        [in] const SHCOLUMNID *pscid, 
+        [out] VARIANT *pv);
+        
+    HRESULT GetDetailsOf(
+        [in] LPCITEMIDLIST pidl, 
+        [in]UINT iColumn, 
+        [out] SHELLDETAILS *psd);
+        
+    HRESULT MapColumnToSCID(
+        [in] UINT iColumn, 
+        [in] SHCOLUMNID *pscid);
+};
+
+cpp_quote("#endif // _WIN32_IE >= 0x0500)")
+
+
+
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// FOLDERSETTINGS")
+cpp_quote("//")
+cpp_quote("//  FOLDERSETTINGS is a data structure that explorer passes from one folder")
+cpp_quote("// view to another, when the user is browsing. It calls ISV::GetCurrentInfo")
+cpp_quote("// member to get the current settings and pass it to ISV::CreateViewWindow")
+cpp_quote("// to allow the next folder view 'inherit' it. These settings assumes a")
+cpp_quote("// particular UI (which the shell's folder view has), and shell extensions")
+cpp_quote("// may or may not use those settings.")
+cpp_quote("//")
+cpp_quote("//--------------------------------------------------------------------------")
+typedef char * LPVIEWSETTINGS;
+
+cpp_quote("// NB Bitfields.")
+cpp_quote("// FWF_DESKTOP implies FWF_TRANSPARENT/NOCLIENTEDGE/NOSCROLL")
+
+typedef [v1_enum] enum
+    {
+    FWF_AUTOARRANGE =       0x00000001,
+    FWF_ABBREVIATEDNAMES =  0x00000002,
+    FWF_SNAPTOGRID =        0x00000004,
+    FWF_OWNERDATA =         0x00000008,
+    FWF_BESTFITWINDOW =     0x00000010,
+    FWF_DESKTOP =           0x00000020,
+    FWF_SINGLESEL =         0x00000040,
+    FWF_NOSUBFOLDERS =      0x00000080,
+    FWF_TRANSPARENT  =      0x00000100,
+    FWF_NOCLIENTEDGE =      0x00000200,
+    FWF_NOSCROLL     =      0x00000400,
+    FWF_ALIGNLEFT    =      0x00000800,
+    FWF_NOICONS      =      0x00001000,
+    FWF_SHOWSELALWAYS =     0x00002000,
+    FWF_NOVISIBLE    =      0X00004000,
+    FWF_SINGLECLICKACTIVATE=0x00008000,     // TEMPORARY -- NO UI FOR THIS
+    FWF_NOWEBVIEW =         0x00010000,
+    FWF_HIDEFILENAMES =     0x00020000,
+    } FOLDERFLAGS;
+
+typedef [v1_enum] enum
+    {
+    FVM_ICON =              1,
+    FVM_SMALLICON =         2,
+    FVM_LIST =              3,
+    FVM_DETAILS =           4,
+    } FOLDERVIEWMODE;
+
+typedef struct
+    {
+    UINT ViewMode;       // View mode (FOLDERVIEWMODE values)
+    UINT fFlags;         // View options (FOLDERFLAGS bits)
+    } FOLDERSETTINGS;
+
+typedef FOLDERSETTINGS *LPFOLDERSETTINGS;                
+typedef const FOLDERSETTINGS * LPCFOLDERSETTINGS;
+typedef FOLDERSETTINGS *PFOLDERSETTINGS;                
+
+cpp_quote("//==========================================================================")
+cpp_quote("//")
+cpp_quote("// Interface:   IShellView")
+cpp_quote("//")
+cpp_quote("// IShellView::GetWindow(phwnd)")
+cpp_quote("//")
+cpp_quote("//   Inherited from IOleWindow::GetWindow.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::ContextSensitiveHelp(fEnterMode)")
+cpp_quote("//")
+cpp_quote("//   Inherited from IOleWindow::ContextSensitiveHelp.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::TranslateAccelerator(lpmsg)")
+cpp_quote("//")
+cpp_quote("//   Similar to IOleInPlaceActiveObject::TranlateAccelerator. The explorer")
+cpp_quote("//  calls this function BEFORE any other translation. Returning S_OK")
+cpp_quote("//  indicates that the message was translated (eaten) and should not be")
+cpp_quote("//  translated or dispatched by the explorer.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::EnableModeless(fEnable)")
+cpp_quote("//   Similar to IOleInPlaceActiveObject::EnableModeless.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::UIActivate(uState)")
+cpp_quote("//")
+cpp_quote("//   The explorer calls this member function whenever the activation")
+cpp_quote("//  state of the view window is changed by a certain event that is")
+cpp_quote("//  NOT caused by the shell view itself.")
+cpp_quote("//")
+cpp_quote("//   SVUIA_DEACTIVATE will be passed when the explorer is about to")
+cpp_quote("//  destroy the shell view window; the shell view is supposed to remove")
+cpp_quote("//  all the extended UIs (typically merged menu and modeless popup windows).")
+cpp_quote("//")
+cpp_quote("//   SVUIA_ACTIVATE_NOFOCUS will be passsed when the shell view is losing")
+cpp_quote("//  the input focus or the shell view has been just created without the")
+cpp_quote("//  input focus; the shell view is supposed to set menuitems appropriate")
+cpp_quote("//  for non-focused state (no selection specific items should be added).")
+cpp_quote("//")
+cpp_quote("//   SVUIA_ACTIVATE_FOCUS will be passed when the explorer has just")
+cpp_quote("//  created the view window with the input focus; the shell view is")
+cpp_quote("//  supposed to set menuitems appropriate for focused state.")
+cpp_quote("//")
+cpp_quote("//   SVUIA_INPLACEACTIVATE(new) will be passed when the shell view is opened")
+cpp_quote("//  within an ActiveX control, which is not a UI active. In this case,")
+cpp_quote("//  the shell view should not merge menus or put toolbas. To be compatible")
+cpp_quote("//  with Win95 client, we don't pass this value unless the view supports")
+cpp_quote("//  IShellView2.")
+cpp_quote("//")
+cpp_quote("//   The shell view should not change focus within this member function.")
+cpp_quote("//  The shell view should not hook the WM_KILLFOCUS message to remerge")
+cpp_quote("//  menuitems. However, the shell view typically hook the WM_SETFOCUS")
+cpp_quote("//  message, and re-merge the menu after calling IShellBrowser::")
+cpp_quote("//  OnViewWindowActivated.")
+cpp_quote("//")
+cpp_quote("//   One of the ACTIVATE / INPLACEACTIVATE messages will be sent when")
+cpp_quote("//  the view window becomes the currently displayed view.  On Win95 systems,")
+cpp_quote("//  this will happen immediately after the CreateViewWindow call.  On IE4, Win98,")
+cpp_quote("//  and NT5 systems this may happen when the view reports it is ready (if the")
+cpp_quote("//  IShellView supports async creation).  This can be used as a hint as to when")
+cpp_quote("//  to make your view window visible.  Note: the Win95/Win98/NT4 common dialogs")
+cpp_quote("//  do not send either of these on creation.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::Refresh()")
+cpp_quote("//")
+cpp_quote("//   The explorer calls this member when the view needs to refresh its")
+cpp_quote("//  contents (such as when the user hits F5 key).")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::CreateViewWindow")
+cpp_quote("//")
+cpp_quote("//   This member creates the view window (right-pane of the explorer or the")
+cpp_quote("//  client window of the folder window).")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::DestroyViewWindow")
+cpp_quote("//")
+cpp_quote("//   This member destroys the view window.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::GetCurrentInfo")
+cpp_quote("//")
+cpp_quote("//   This member returns the folder settings.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::AddPropertySHeetPages")
+cpp_quote("//")
+cpp_quote("//   The explorer calls this member when it is opening the option property")
+cpp_quote("//  sheet. This allows the view to add additional pages to it.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::SaveViewState()")
+cpp_quote("//")
+cpp_quote("//   The explorer calls this member when the shell view is supposed to")
+cpp_quote("//  store its view settings. The shell view is supposed to get a view")
+cpp_quote("//  stream by calling IShellBrowser::GetViewStateStream and store the")
+cpp_quote("//  current view state into that stream.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellView::SelectItem(pidlItem, uFlags)")
+cpp_quote("//")
+cpp_quote("//   The explorer calls this member to change the selection state of")
+cpp_quote("//  item(s) within the shell view window.  If pidlItem is NULL and uFlags")
+cpp_quote("//  is SVSI_DESELECTOTHERS, all items should be deselected.")
+cpp_quote("//")
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("")
+cpp_quote("//")
+cpp_quote("// shellview select item flags")
+cpp_quote("//")
+cpp_quote("#define SVSI_DESELECT   0x0000")
+cpp_quote("#define SVSI_SELECT     0x0001")
+cpp_quote("#define SVSI_EDIT       0x0003  // includes select")
+cpp_quote("#define SVSI_DESELECTOTHERS 0x0004")
+cpp_quote("#define SVSI_ENSUREVISIBLE  0x0008")
+cpp_quote("#define SVSI_FOCUSED        0x0010")
+cpp_quote("#define SVSI_TRANSLATEPT    0x0020")
+cpp_quote("")
+cpp_quote("//")
+cpp_quote("// shellview get item object flags")
+cpp_quote("//")
+cpp_quote("#define SVGIO_BACKGROUND    0x00000000")
+cpp_quote("#define SVGIO_SELECTION     0x00000001")
+cpp_quote("#define SVGIO_ALLVIEW       0x00000002")
+cpp_quote("")
+cpp_quote("//")
+cpp_quote("// uState values for IShellView::UIActivate")
+cpp_quote("//")
+
+typedef [v1_enum] enum {
+    SVUIA_DEACTIVATE       = 0,
+    SVUIA_ACTIVATE_NOFOCUS = 1,
+    SVUIA_ACTIVATE_FOCUS   = 2,
+    SVUIA_INPLACEACTIVATE  = 3          // new flag for IShellView2
+} SVUIA_STATUS;
+
+//  this is to handle name collisions 
+cpp_quote("#ifdef _FIX_ENABLEMODELESS_CONFLICT")
+cpp_quote("#define    EnableModeless EnableModelessSV")
+cpp_quote("#endif")
+
+//
+//  this is so that all the implementations still get the function pointer.
+//  and midl wont complain about the data type
+//
+cpp_quote("#ifdef _NEVER_")
+typedef LPARAM LPFNSVADDPROPSHEETPAGE;
+cpp_quote("#else //!_NEVER_")
+cpp_quote("#include <prsht.h>")
+cpp_quote("typedef LPFNADDPROPSHEETPAGE LPFNSVADDPROPSHEETPAGE;")
+cpp_quote("#endif //_NEVER_")
+
+interface IShellBrowser;
+
+interface IShellView;
+[
+    helpstring("IShellView"),
+    uuid(000214E3-0000-0000-C000-000000000046),
+    object,
+    pointer_default(unique)
+]
+interface IShellView : IOleWindow
+{
+    HRESULT TranslateAccelerator([in] LPMSG lpmsg);
+    HRESULT EnableModeless([in] BOOL fEnable);
+    HRESULT UIActivate([in] UINT uState);
+    HRESULT Refresh();
+    HRESULT CreateViewWindow(
+        [in] IShellView  *psvPrevious,
+        [in] LPCFOLDERSETTINGS lpfs, 
+        [in] IShellBrowser  * psb,
+        [out] RECT *prcView, 
+        [out] HWND  *phWnd);
+        
+    HRESULT DestroyViewWindow();
+    
+    HRESULT GetCurrentInfo(
+        [out] LPFOLDERSETTINGS lpfs);
+
+    [local] HRESULT AddPropertySheetPages(
+        [in] DWORD dwReserved,
+        [in] LPFNSVADDPROPSHEETPAGE lpfn, 
+        [in] LPARAM lparam);
+
+    HRESULT SaveViewState();
+    
+    HRESULT SelectItem(
+        [in] LPCITEMIDLIST pidlItem, 
+        [in] UINT uFlags);
+        
+    HRESULT GetItemObject(
+        [in] UINT uItem, 
+        [in] REFIID riid,
+        [out, iid_is(riid)] void **ppv);
+};
+
+typedef IShellView *LPSHELLVIEW;
+
+typedef GUID SHELLVIEWID;
+
+cpp_quote("#define SV2GV_CURRENTVIEW ((UINT)-1)")
+cpp_quote("#define SV2GV_DEFAULTVIEW ((UINT)-2)")
+cpp_quote("// The pvid parameter of the GetView() method of IShellView2 is normally only an OUT parameter.")
+cpp_quote("// But, for SV2GV_ISEXTENDEDVIEW, it is an IN parameter.")
+cpp_quote("#define SV2GV_ISEXTENDEDVIEW    ((UINT)-3)")
+//")
+//  NOTE if the cbSize param is ever updated,")
+//  then there will have to be custom [wire_marshal]")
+//  implementation to support it")
+//")
+typedef struct _SV2CVW2_PARAMS
+{
+    DWORD cbSize;
+
+    IShellView *psvPrev;
+    LPCFOLDERSETTINGS pfs;
+    IShellBrowser *psbOwner;
+    RECT *prcView;
+    SHELLVIEWID const *pvid;
+    HWND hwndView;
+} SV2CVW2_PARAMS;
+typedef SV2CVW2_PARAMS *LPSV2CVW2_PARAMS;
+
+interface IShellView2;
+[
+    helpstring("IShellView2"),
+    uuid(88E39E80-3578-11CF-AE69-08002B2E1262),
+    object,
+    pointer_default(unique)
+]
+interface IShellView2 : IShellView
+{
+    // *** IShellView2 methods ***
+    HRESULT GetView(
+        [in, out] SHELLVIEWID* pvid, 
+        [in] ULONG uView);
+        
+    HRESULT CreateViewWindow2(
+        [in] LPSV2CVW2_PARAMS lpParams);
+        
+    HRESULT HandleRename(
+        [in] LPCITEMIDLIST pidlNew);
+        
+    HRESULT SelectAndPositionItem(
+        [in] LPCITEMIDLIST pidlItem,
+        [in] UINT uFlags,
+        [in] POINT *ppt);
+};
+
+//  this is to handle name collisions 
+cpp_quote("#ifdef _FIX_ENABLEMODELESS_CONFLICT")
+cpp_quote("#undef    EnableModeless ")
+cpp_quote("#endif")
+
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// Interface:   IShellBrowser")
+cpp_quote("//")
+cpp_quote("//  IShellBrowser interface is the interface that is provided by the shell")
+cpp_quote("// explorer/folder frame window. When it creates the 'contents pane' of")
+cpp_quote("// a shell folder (which provides IShellFolder interface), it calls its")
+cpp_quote("// CreateViewObject member function to create an IShellView object. Then,")
+cpp_quote("// it calls its CreateViewWindow member to create the 'contents pane'")
+cpp_quote("// window. The pointer to the IShellBrowser interface is passed to")
+cpp_quote("// the IShellView object as a parameter to this CreateViewWindow member")
+cpp_quote("// function call.")
+cpp_quote("//")
+cpp_quote("//    +--------------------------+  <-- Explorer window")
+cpp_quote("//    | [] Explorer              |")
+cpp_quote("//    |--------------------------+       IShellBrowser")
+cpp_quote("//    | File Edit View ..        |")
+cpp_quote("//    |--------------------------|")
+cpp_quote("//    |        |                 |")
+cpp_quote("//    |        |              <-------- Content pane")
+cpp_quote("//    |        |                 |")
+cpp_quote("//    |        |                 |       IShellView")
+cpp_quote("//    |        |                 |")
+cpp_quote("//    |        |                 |")
+cpp_quote("//    +--------------------------+")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// [Member functions]")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::GetWindow(phwnd)")
+cpp_quote("//")
+cpp_quote("//   Inherited from IOleWindow::GetWindow.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::ContextSensitiveHelp(fEnterMode)")
+cpp_quote("//")
+cpp_quote("//   Inherited from IOleWindow::ContextSensitiveHelp.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::InsertMenusSB(hmenuShared, lpMenuWidths)")
+cpp_quote("//")
+cpp_quote("//   Similar to the IOleInPlaceFrame::InsertMenus. The explorer will put")
+cpp_quote("//  'File' and 'Edit' pulldown in the File menu group, 'View' and 'Tools'")
+cpp_quote("//  in the Container menu group and 'Help' in the Window menu group. Each")
+cpp_quote("//  pulldown menu will have a uniqu ID, FCIDM_MENU_FILE/EDIT/VIEW/TOOLS/HELP")
+cpp_quote("//  The view is allowed to insert menuitems into those sub-menus by those")
+cpp_quote("//  IDs must be between FCIDM_SHVIEWFIRST and FCIDM_SHVIEWLAST.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::SetMenuSB(hmenuShared, holemenu, hwndActiveObject)")
+cpp_quote("//")
+cpp_quote("//   Similar to the IOleInPlaceFrame::SetMenu. The explorer ignores the")
+cpp_quote("//  holemenu parameter (reserved for future enhancement)  and performs")
+cpp_quote("//  menu-dispatch based on the menuitem IDs (see the description above).")
+cpp_quote("//  It is important to note that the explorer will add different")
+cpp_quote("//  set of menuitems depending on whether the view has a focus or not.")
+cpp_quote("//  Therefore, it is very important to call ISB::OnViewWindowActivate")
+cpp_quote("//  whenever the view window (or its children) gets the focus.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::RemoveMenusSB(hmenuShared)")
+cpp_quote("//")
+cpp_quote("//   Same as the IOleInPlaceFrame::RemoveMenus.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::SetStatusTextSB(pszStatusText)")
+cpp_quote("//")
+cpp_quote("//   Same as the IOleInPlaceFrame::SetStatusText. It is also possible to")
+cpp_quote("//  send messages directly to the status window via SendControlMsg.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::EnableModelessSB(fEnable)")
+cpp_quote("//")
+cpp_quote("//   Same as the IOleInPlaceFrame::EnableModeless.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::TranslateAcceleratorSB(lpmsg, wID)")
+cpp_quote("//")
+cpp_quote("//   Same as the IOleInPlaceFrame::TranslateAccelerator, but will be")
+cpp_quote("//  never called because we don't support EXEs (i.e., the explorer has")
+cpp_quote("//  the message loop). This member function is defined here for possible")
+cpp_quote("//  future enhancement.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::BrowseObject(pidl, wFlags)")
+cpp_quote("//")
+cpp_quote("//   The view calls this member to let shell explorer browse to another")
+cpp_quote("//  folder. The pidl and wFlags specifies the folder to be browsed.")
+cpp_quote("//")
+cpp_quote("//  Following three flags specifies whether it creates another window or not.")
+cpp_quote("//   SBSP_SAMEBROWSER  -- Browse to another folder with the same window.")
+cpp_quote("//   SBSP_NEWBROWSER   -- Creates another window for the specified folder.")
+cpp_quote("//   SBSP_DEFBROWSER   -- Default behavior (respects the view option).")
+cpp_quote("//")
+cpp_quote("//  Following three flags specifies open, explore, or default mode. These   .")
+cpp_quote("//  are ignored if SBSP_SAMEBROWSER or (SBSP_DEFBROWSER && (single window   .")
+cpp_quote("//  browser || explorer)).                                                  .")
+cpp_quote("//   SBSP_OPENMODE     -- Use a normal folder window")
+cpp_quote("//   SBSP_EXPLOREMODE  -- Use an explorer window")
+cpp_quote("//   SBSP_DEFMODE      -- Use the same as the current window")
+cpp_quote("//")
+cpp_quote("//  Following three flags specifies the pidl.")
+cpp_quote("//   SBSP_ABSOLUTE -- pidl is an absolute pidl (relative from desktop)")
+cpp_quote("//   SBSP_RELATIVE -- pidl is relative from the current folder.")
+cpp_quote("//   SBSP_PARENT   -- Browse the parent folder (ignores the pidl)")
+cpp_quote("//   SBSP_NAVIGATEBACK    -- Navigate back (ignores the pidl)")
+cpp_quote("//   SBSP_NAVIGATEFORWARD -- Navigate forward (ignores the pidl)")
+cpp_quote("//")
+cpp_quote("//  Following two flags control history manipulation as result of navigate")
+cpp_quote("//   SBSP_WRITENOHISTORY -- write no history (shell folder) entry")
+cpp_quote("//   SBSP_NOAUTOSELECT -- suppress selection in history pane")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::GetViewStateStream(grfMode, ppstm)")
+cpp_quote("//")
+cpp_quote("//   The browser returns an IStream interface as the storage for view")
+cpp_quote("//  specific state information.")
+cpp_quote("//")
+cpp_quote("//   grfMode -- Specifies the read/write access (STGM_READ/WRITE/READWRITE)")
+cpp_quote("//   ppstm   -- Specifies the IStream *variable to be filled.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::GetControlWindow(id, phwnd)")
+cpp_quote("//")
+cpp_quote("//   The shell view may call this member function to get the window handle")
+cpp_quote("//  of Explorer controls (toolbar or status winodw -- FCW_TOOLBAR or")
+cpp_quote("//  FCW_STATUS).")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::SendControlMsg(id, uMsg, wParam, lParam, pret)")
+cpp_quote("//")
+cpp_quote("//   The shell view calls this member function to send control messages to")
+cpp_quote("//  one of Explorer controls (toolbar or status window -- FCW_TOOLBAR or")
+cpp_quote("//  FCW_STATUS).")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::QueryActiveShellView(IShellView * ppshv)")
+cpp_quote("//")
+cpp_quote("//   This member returns currently activated (displayed) shellview object.")
+cpp_quote("//  A shellview never need to call this member function.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::OnViewWindowActive(pshv)")
+cpp_quote("//")
+cpp_quote("//   The shell view window calls this member function when the view window")
+cpp_quote("//  (or one of its children) got the focus. It MUST call this member before")
+cpp_quote("//  calling IShellBrowser::InsertMenus, because it will insert different")
+cpp_quote("//  set of menu items depending on whether the view has the focus or not.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// IShellBrowser::SetToolbarItems(lpButtons, nButtons, uFlags)")
+cpp_quote("//")
+cpp_quote("//   The view calls this function to add toolbar items to the exporer's")
+cpp_quote("//  toolbar. 'lpButtons' and 'nButtons' specifies the array of toolbar")
+cpp_quote("//  items. 'uFlags' must be one of FCT_MERGE, FCT_CONFIGABLE, FCT_ADDTOEND.")
+cpp_quote("//")
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("")
+cpp_quote("//")
+cpp_quote("// Values for wFlags parameter of ISB::BrowseObject() member.")
+cpp_quote("//")
+cpp_quote("#define SBSP_DEFBROWSER         0x0000")
+cpp_quote("#define SBSP_SAMEBROWSER        0x0001")
+cpp_quote("#define SBSP_NEWBROWSER         0x0002")
+cpp_quote("")
+cpp_quote("#define SBSP_DEFMODE            0x0000")
+cpp_quote("#define SBSP_OPENMODE           0x0010")
+cpp_quote("#define SBSP_EXPLOREMODE        0x0020")
+cpp_quote("#define SBSP_HELPMODE           0x0040 // IEUNIX : Help window uses this.")
+cpp_quote("#define SBSP_NOTRANSFERHIST     0x0080")
+cpp_quote("")
+cpp_quote("#define SBSP_ABSOLUTE           0x0000")
+cpp_quote("#define SBSP_RELATIVE           0x1000")
+cpp_quote("#define SBSP_PARENT             0x2000")
+cpp_quote("#define SBSP_NAVIGATEBACK       0x4000")
+cpp_quote("#define SBSP_NAVIGATEFORWARD    0x8000")
+cpp_quote("")
+cpp_quote("#define SBSP_ALLOW_AUTONAVIGATE 0x10000")
+cpp_quote("")
+cpp_quote("#define SBSP_NOAUTOSELECT       0x04000000")
+cpp_quote("#define SBSP_WRITENOHISTORY     0x08000000")
+cpp_quote("")
+cpp_quote("#define SBSP_REDIRECT                     0x40000000")
+cpp_quote("#define SBSP_INITIATEDBYHLINKFRAME        0x80000000")
+cpp_quote("//")
+cpp_quote("// Values for id parameter of ISB::GetWindow/SendControlMsg members.")
+cpp_quote("//")
+cpp_quote("// WARNING:")
+cpp_quote("//  Any shell extensions which sends messages to those control windows")
+cpp_quote("// might not work in the future version of windows. If you really need")
+cpp_quote("// to send messages to them, (1) don't assume that those control window")
+cpp_quote("// always exist (i.e. GetControlWindow may fail) and (2) verify the window")
+cpp_quote("// class of the window before sending any messages.")
+cpp_quote("//")
+cpp_quote("#define FCW_STATUS      0x0001")
+cpp_quote("#define FCW_TOOLBAR     0x0002")
+cpp_quote("#define FCW_TREE        0x0003")
+cpp_quote("#define FCW_VIEW        0x0004  ")//;Internal
+cpp_quote("#define FCW_BROWSER     0x0005  //;Internal")
+cpp_quote("#define FCW_INTERNETBAR 0x0006")
+cpp_quote("#define FCW_MENUBAR     0x0007  //;internal")
+cpp_quote("#define FCW_PROGRESS    0x0008")
+cpp_quote("")
+cpp_quote("#if (_WIN32_IE >= 0x0400)")
+cpp_quote("#define FCW_ADDRESSBAR  0x0009  //;internal")
+cpp_quote("#define FCW_TOOLBAND    0x000a  //;internal")
+cpp_quote("#define FCW_LINKSBAR    0x000b  //;internal")
+cpp_quote("#endif")
+cpp_quote("")
+cpp_quote("//")
+cpp_quote("// Values for uFlags paremeter of ISB::SetToolbarItems member.")
+cpp_quote("//")
+cpp_quote("#define FCT_MERGE       0x0001")
+cpp_quote("#define FCT_CONFIGABLE  0x0002")
+cpp_quote("#define FCT_ADDTOEND    0x0004")
+
+cpp_quote("#ifdef _NEVER_")
+typedef LPARAM LPTBBUTTONSB;
+cpp_quote("#else //!_NEVER_")
+cpp_quote("#include <commctrl.h>")
+cpp_quote("typedef LPTBBUTTON LPTBBUTTONSB;")
+cpp_quote("#endif //_NEVER_")
+
+interface IShellBrowser;
+[
+    helpstring("IShellBrowser"),
+    uuid(000214E2-0000-0000-C000-000000000046),
+    object,
+    pointer_default(unique)
+]
+interface IShellBrowser : IOleWindow
+{
+    // *** IShellBrowser methods *** (same as IOleInPlaceFrame)
+    HRESULT InsertMenusSB(
+        [in] HMENU hmenuShared, 
+        [in, out] LPOLEMENUGROUPWIDTHS lpMenuWidths);
+        
+    HRESULT SetMenuSB(
+        [in] HMENU hmenuShared, 
+        [in] HOLEMENU holemenuRes, 
+        [in] HWND hwndActiveObject);
+        
+    HRESULT RemoveMenusSB([in] HMENU hmenuShared);
+    HRESULT SetStatusTextSB([in, unique] LPCOLESTR pszStatusText);
+    HRESULT EnableModelessSB([in] BOOL fEnable);
+    HRESULT TranslateAcceleratorSB([in] MSG *pmsg, [in] WORD wID);
+
+    // *** IShellBrowser methods ***
+    HRESULT BrowseObject(
+        [in] LPCITEMIDLIST pidl, 
+        [in] UINT wFlags);
+        
+    HRESULT GetViewStateStream(
+        [in] DWORD grfMode, 
+        [out] IStream **ppStrm);
+        
+    HRESULT GetControlWindow(
+        [in] UINT id, 
+        [out] HWND * lphwnd);
+        
+    [local] HRESULT SendControlMsg(
+        [in] UINT id, 
+        [in] UINT uMsg, 
+        [in] WPARAM wParam, 
+        [in] LPARAM lParam, 
+        [in] LRESULT *pret);
+        
+    HRESULT QueryActiveShellView([in] IShellView **ppshv);
+    HRESULT OnViewWindowActive([in] IShellView *pshv);
+    [local] HRESULT SetToolbarItems(
+        [in] LPTBBUTTONSB lpButtons, 
+        [in] UINT nButtons, 
+        [in] UINT uFlags);
+};
+
+typedef IShellBrowser * LPSHELLBROWSER;
+
+
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// IShellNetCrawler interface")
+cpp_quote("//")
+cpp_quote("// [Member functions]")
+cpp_quote("//")
+cpp_quote("//   IShellNetCrawler::Update")
+cpp_quote("//   Causes an enumeration of the local workgroup and subsequent addition")
+cpp_quote("//   of folder shortcut and printer objects.   As is a blocking call")
+cpp_quote("//   which will potentially take a long time (seconds) it should be called")
+cpp_quote("//   on a seperate thread")
+
+cpp_quote("#define SNCF_IGNORERAS   0x00000001")
+
+interface IShellNetCrawler;
+[
+    helpstring("IShellNetCrawler"),
+    uuid(49c929ee-a1b7-4c58-b539-e63be392b6f3),
+    object,
+    pointer_default(unique)
+]
+interface IShellNetCrawler : IUnknown
+{
+    HRESULT Update([in] DWORD dwFlags);
+}
+
+[
+    helpstring("IProfferService"),
+	uuid(cb728b20-f786-11ce-92ad-00aa00a74cd0), // IID_IProfferService
+    object,
+    pointer_default(unique)
+]
+interface IProfferService : IUnknown
+{
+    HRESULT ProfferService([in]REFGUID rguidService, [in] IServiceProvider *psp, [out] DWORD *pdwCookie);
+    HRESULT RevokeService([in]DWORD dwCookie);
+}
+
+cpp_quote("#define SID_SProfferService IID_IProfferService	// nearest service that you can proffer to")
+
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// ICompositeFolder interface")
+cpp_quote("//")
+cpp_quote("// [Member functions]")
+cpp_quote("//")
+cpp_quote("//   ICompositeFolder::InitComposite")
+cpp_quote("//       initializes a composite folder with the information necessary to aggregate")
+cpp_quote("//       the child folders")
+
+typedef [v1_enum] enum _CFITYPE{
+    CFITYPE_CSIDL   = 0,    // Use COMPFOLDERINIT.csidl
+    CFITYPE_PIDL,           // Use COMPFOLDERINIT.pidl
+    CFITYPE_PATH,           // Use COMPFOLDERINIT.pszPath
+} CFITYPE;
+
+[v1_enum] enum {
+    CFINITF_CHILDREN    = 0x0000,   //  each composite folder will show up as a child
+    CFINITF_FLAT        = 0x0001,   //  each folder's children show up flat together
+};
+
+typedef UINT CFINITF;
+
+typedef struct _COMPFOLDERINIT 
+{
+    UINT uType;
+    [switch_type(UINT), switch_is(uType)] union 
+    {
+    [case(CFITYPE_CSIDL)]   int csidl;     
+    [case(CFITYPE_PIDL)]    LPCITEMIDLIST pidl;
+    [case(CFITYPE_PATH)]    [string] LPOLESTR pszPath;
+    } DUMMYUNIONNAME;
+    LPOLESTR pszName;
+} COMPFOLDERINIT;
+
+interface ICompositeFolder;
+[
+    helpstring("ICompositeFolder"),
+    uuid(601ac3dd-786a-4eb0-bf40-ee3521e70bfb),  // IID_ICompositeFolder
+    object,
+    pointer_default(unique)
+]
+interface ICompositeFolder : IUnknown
+{
+    HRESULT InitComposite(
+        [in] WORD wSignature, 
+        [in] REFCLSID refclsid, 
+        [in] CFINITF flags,
+        [in] ULONG celt, 
+        [in, size_is(celt)] const COMPFOLDERINIT *rgCFs);
+
+    HRESULT BindToParent(
+        [in] LPCITEMIDLIST pidl,
+        [in] REFIID riid, 
+        [out, iid_is(riid)] void **ppv,
+        [out] LPITEMIDLIST *ppidlLast);
+}
+
+interface IFolderAndItem;
+[
+    helpstring("IFolderAndItem"),
+    uuid(b3a4b685-b234-4805-99d9-5dead2873236),  // IID_IFolderAndItems
+    object,
+    pointer_default(unique)
+]
+interface IFolderAndItem : IUnknown
+{
+    HRESULT SetFolderAndItem([in] IShellFolder *psf,  [in] LPCITEMIDLIST pidl);
+    HRESULT GetFolderAndItem([out] IShellFolder **ppsf, [out] LPITEMIDLIST *ppidl);
+}
+
+typedef [v1_enum] enum
+{
+    PUIF_DEFAULT            = 0x00000000,
+    PUIF_RIGHTALIGN         = 0x00000001,   // this property should be right alligned
+    PUIF_NOLABELININFOTIP   = 0x00000002,   // this property should not display a label in the infotip
+} PROPERTYUI_FLAGS;
+
+typedef [v1_enum] enum
+{
+    PUIFFDF_DEFAULT         = 0x00000000,
+    PUIFFDF_RIGHTTOLEFT     = 0x00000001,   // BIDI support, right to left caller
+    PUIFFDF_SHORTFORMAT     = 0x00000002,   // short format version of string
+    PUIFFDF_NOTIME          = 0x00000004,   // truncate time to days, not hours/mins/sec
+    PUIFFDF_FRIENDLYDATE    = 0x00000008,   // "Today", "Yesterday", etc
+    PUIFFDF_NOUNITS         = 0x00000010,   // don't do "KB", "MB", "KHz"
+} PROPERTYUI_FORMAT_FLAGS;
+
+[
+    helpstring("IPropertyUI - helper for dealing with properties ala IPropertySetStorage"),
+    uuid(d43eacec-eaaf-4aae-ba46-eecba97d988a),
+    object,
+    pointer_default(unique)
+]
+interface IPropertyUI : IUnknown
+{
+    HRESULT ParsePropertyName([in] LPCWSTR pszName, [out] FMTID *pfmtid, [out] PROPID *ppid, [out] ULONG *pchEaten);
+    HRESULT GetCannonicalName([in] REFFMTID fmtid, [in] PROPID pid, [out, size_is(cchText)] LPWSTR pwszText, [in] DWORD cchText);
+    HRESULT GetDisplayName([in] REFFMTID fmtid, [in] PROPID pid, [out, size_is(cchText)] LPWSTR pwszText, [in] DWORD cchText);
+    HRESULT GetPropertyDescription([in] REFFMTID fmtid, [in] PROPID pid, [out, size_is(cchText)] LPWSTR pwszText, [in] DWORD cchText);
+    HRESULT GetDefaultWidth([in] REFFMTID fmtid, [in] PROPID pid, [out] ULONG *pcxChars);
+    HRESULT GetFlags([in] REFFMTID fmtid, [in] PROPID pid, [out] PROPERTYUI_FLAGS *pFlags);
+    HRESULT FormatForDisplay([in] REFFMTID fmtid, [in] PROPID pid, [in] const VARIANT *pvar, [in] PROPERTYUI_FORMAT_FLAGS flags, [out, size_is(cchText)] LPWSTR pwszText, [in] DWORD cchText);
+}
+
+cpp_quote("//-------------------------------------------------------------------------")
+cpp_quote("//")
+cpp_quote("// ITaskbarList interface")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// [Member functions]")
+cpp_quote("//")
+cpp_quote("// ITaskbarList::HrInit()")
+cpp_quote("//   This function must be called first to validate use of other members.")
+cpp_quote("//")
+cpp_quote("// ITaskbarList::AddTab(hwnd)")
+cpp_quote("//   This function adds a tab for hwnd to the taskbar.")
+cpp_quote("//")
+cpp_quote("// ITaskbarList::DeleteTab(hwnd)")
+cpp_quote("//   This function deletes a tab for hwnd from the taskbar.")
+cpp_quote("//")
+cpp_quote("// ITaskbarList::ActivateTab(hwnd)")
+cpp_quote("//   This function activates the tab associated with hwnd on the taskbar.")
+cpp_quote("//")
+cpp_quote("// ITaskbarList::SetActivateAlt(hwnd)")
+cpp_quote("//   This function marks hwnd in the taskbar as the active tab")
+cpp_quote("//")
+cpp_quote("//-------------------------------------------------------------------------")
+[
+    uuid(56FDF342-FD6D-11d0-958A-006097C9A090),
+    object,
+]
+interface ITaskbarList : IUnknown
+{
+    HRESULT HrInit();
+    HRESULT AddTab([in] HWND hwnd);
+    HRESULT DeleteTab([in] HWND hwnd);
+    HRESULT ActivateTab([in] HWND hwnd);
+    HRESULT SetActiveAlt([in] HWND hwnd);
+};
+
+[
+    uuid(602D4995-B13A-429b-A66E-1935E44F4317),
+    object,
+]
+interface ITaskbarList2 : ITaskbarList
+{
+    HRESULT MarkFullscreenWindow([in] HWND hwnd, [in] BOOL fFullscreen);
+};
+
+//
+//  NOTE - this typelib is never registered anywhere
+//  objects that want their typelibs to be registered 
+//  in shell32 should add their coclass to shldisp.idl
+//
+[
+    uuid(50a7e9b1-70ef-11d1-b75a-00a0c90564fe), // LIBID_ShellObjects
+    helpstring("Microsoft Shell Objects"),
+    lcid(0x0000),
+    version(1.0)
+]
+library ShellObjects
+{
+    [
+        uuid(FEF10DED-355E-4e06-9381-9B24D7F7CC88), // CLSID_CompositeFolder
+    ]
+    coclass CompositeFolder
+    {
+        [restricted] interface ICompositeFolder;
+    }
+
+    [
+        uuid(7ab770c7-0e23-4d7a-8aa2-19bfad479829), // CLSID_ImageProperties
+    ]
+    coclass ImageProperties
+    {
+        [restricted] interface IPersistFile;
+    }
+
+    [
+        uuid(d912f8cf-0396-4915-884e-fb425d32943b), // CLSID_PropertiesUI
+    ]
+    coclass PropertiesUI
+    {
+        [restricted] interface IPropertyUI;
+    }
+
+    [
+        uuid(56FDF344-FD6D-11d0-958A-006097C9A090), // CLSID_TaskbarList
+    ]
+    coclass TaskbarList
+    {
+        interface ITaskbarList2;
+    }
+};

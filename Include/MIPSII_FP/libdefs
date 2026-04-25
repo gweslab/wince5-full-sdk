@@ -1,0 +1,37 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+/*
+ Various macros used within standard headers
+*/
+
+#if     _MSC_VER > 1000
+#pragma once
+#endif
+
+#ifndef _INC_LIBDEFS
+#define _INC_LIBDEFS
+
+// Define _CRTIMP
+#ifndef _CRTIMP
+#define _CRTIMP
+#endif
+
+// Macros for putting declarations in std namespace
+#define _STDDEFS_BEGIN namespace std {
+#define _STDDEFS_END   };
+
+// disable "ignored exception specification" warning
+#pragma warning(disable: 4290)
+
+#endif // _INC_LIBDEFS
+
+
+

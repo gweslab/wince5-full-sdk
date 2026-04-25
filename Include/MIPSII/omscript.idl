@@ -1,0 +1,42 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+
+// These definitions are to smooth out the transition from old interface names to the
+// new ones.
+cpp_quote("#define IOmDocument2           IHTMLDocument2" )
+cpp_quote("#define IOmFramesCollection2   IHTMLFramesCollection2" )
+cpp_quote("#define IOmWindow2             IHTMLWindow2" )
+cpp_quote("#define IOmWindowEvents        IHTMLWindowEvents" )
+cpp_quote("#define IOmImage               IHTMLImgElement ")
+cpp_quote("#define IOmImageEvents          HTMLImageEvents")
+cpp_quote("#define IOmImagesCollection    IHTMLElementCollection")
+cpp_quote("#define IOmLink                IHTMLAnchorElement")
+cpp_quote("#define IOmLinkEvents           HTMLAnchorEvents")
+cpp_quote("#define IOmAnchor              IHTMLAnchorElement")
+cpp_quote("#define IOmLinksCollection2    IHTMLElementCollection ")
+cpp_quote("#define IOmAnchorsCollection2  IHTMLElementCollection ")
+cpp_quote("#define IOmElementsCollection2 IHTMLElementCollection ")
+cpp_quote("#define IOmForm2               IHTMLFormElement") 
+cpp_quote("#define IOmFormsCollection2    IHTMLElementCollection ")
+cpp_quote("#define IOmWindowEvents        IHTMLWindowEvents")
+
+#include <mshtml.idl>

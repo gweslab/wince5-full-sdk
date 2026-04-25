@@ -1,0 +1,90 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//---------------------------------------------------------------------------=")
+cpp_quote("// IVersionVector Interface.")
+cpp_quote("")
+
+import "objidl.idl";
+import "oleidl.idl";
+
+interface IVersionVector;
+
+//+---------------------------------------------------------------------------
+//
+//  Copyright (C) Microsoft Corporation, 1995-1998.
+//
+//  Contents:  IVersionVector interface definition
+//
+//----------------------------------------------------------------------------
+
+cpp_quote("#ifndef _LPVERSION_DEFINED")
+cpp_quote("#define _LPVERSION_DEFINED")
+
+[object, uuid(4eb01410-db1a-11d1-ba53-00c04fc2040e), pointer_default(unique)]
+interface IVersionVector : IUnknown
+{
+	typedef [unique] IVersionVector *LPVERSION;
+
+    HRESULT SetVersion(
+            [in]const OLECHAR *pchComponent,
+            [in]const OLECHAR *pchVersion);
+
+	HRESULT GetVersion(
+            [in]const OLECHAR *pchComponent,
+            [out]OLECHAR *pchVersion,
+            [in, out]ULONG *pcchVersion);
+}
+
+cpp_quote("#endif")
+
+//+---------------------------------------------------------------------------
+//
+//  Copyright (C) Microsoft Corporation, 1995-1998.
+//
+//  Contents:  IVersionVectorHost interface definition
+//
+//----------------------------------------------------------------------------
+
+cpp_quote("EXTERN_C const GUID SID_SVersionHost;")
+
+cpp_quote("#ifndef _LPVERSIONHOST_DEFINED")
+cpp_quote("#define _LPVERSIONHOST_DEFINED")
+
+[object, uuid(667115ac-dc02-11d1-ba57-00c04fc2040e), pointer_default(unique)]
+interface IVersionHost : IUnknown
+{
+	typedef [unique] IVersionHost *LPVERSIONHOST;
+
+    HRESULT QueryUseLocalVersionVector(
+            [out]BOOL *fUseLocal);
+            
+    HRESULT QueryVersionVector(
+            [in]IVersionVector *pVersion);
+}
+
+cpp_quote("#endif")
+
+

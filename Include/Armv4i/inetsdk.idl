@@ -1,0 +1,33 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("// ActiveX SDK Merged IDL.")
+cpp_quote("")
+
+import "comcat.idl";
+import "ocidl.idl";
+import "docobj.idl";
+import "hlink.idl";
+import "urlmon.idl";

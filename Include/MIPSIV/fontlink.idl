@@ -1,0 +1,106 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+
+import "unknwn.idl";
+
+
+cpp_quote("#define USM_AVAILABLESIDONLY 0x01")
+
+[
+    uuid(3145d000-89c0-48eb-9e01-7b0107e422a0),
+    version(1.0),
+    helpstring("MSHTMLFontLink 1.0 Type Library")
+]
+library MSHTMLFontLink
+{
+//    importlib("stdole32.tlb");
+//    importlib("stdole2.tlb");
+
+    [
+        uuid(3145d001-89c0-48eb-9e01-7b0107e422a0),
+        helpstring("MSHTMLFontLink Object")
+    ]
+    coclass CMSHTMLFontLink
+    {
+        interface IUnicodeScriptMapper;
+//        interface IClassFactory;
+    };
+
+
+	[
+		object,
+		uuid(3145d002-89c0-48eb-9e01-7b0107e422a0),
+	    helpstring("IUnicodeScriptMapper Interface"),   
+		pointer_default(unique)
+	]
+	interface IUnicodeScriptMapper : IUnknown
+	{
+	    [helpstring("method GetScriptId")]
+		HRESULT GetScriptId(
+			[in]  wchar_t ch, 
+			[out] byte * pScriptId);
+
+	    [helpstring("method GetScriptIdMulti")]
+		HRESULT GetScriptIdMulti(
+			[in, size_is(cch)] const wchar_t * pch, 
+			[in]  long cch,
+			[out] long * pcchSplit, 
+			[out] byte * pScriptId);
+
+	    [helpstring("method UnunifyHanScript")]
+		HRESULT UnunifyHanScript(
+			[in]  wchar_t ch, 
+			[in]  byte sidPrefered, 
+			[in]  hyper sidsAvailable, 
+			[in]  byte flags, 
+			[out] byte * pScriptId);
+
+	    [helpstring("method UnunifyHanScriptMulti")]
+		HRESULT UnunifyHanScriptMulti(
+			[in, size_is(cch)] const wchar_t * pch, 
+			[in]  long cch,
+			[in]  byte sidPrefered, 
+			[in]  hyper sidsAvailable, 
+			[in]  byte flags, 
+			[out] long * pcchSplit, 
+			[out] byte * pScriptId);
+
+	    [helpstring("method DisambiguateScript")]
+		HRESULT DisambiguateScript(
+			[in]  wchar_t ch, 
+			[in]  byte sidPrefered, 
+			[in]  hyper sidsAvailable, 
+			[in]  byte flags, 
+			[out] byte * pScriptId);
+
+	    [helpstring("method DisambiguateScriptMulti")]
+		HRESULT DisambiguateScriptMulti(
+			[in, size_is(cch)] const wchar_t * pch, 
+			[in]  long cch,
+			[in]  byte sidPrefered, 
+			[in]  hyper sidsAvailable, 
+			[in]  byte flags, 
+			[out] long * pcchSplit, 
+			[out] byte * pScriptId);
+
+	};
+};

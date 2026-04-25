@@ -1,0 +1,155 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+//+---------------------------------------------------------------------------
+//
+//
+//  File:       notftn.idl
+//
+//  Contents:   wrapper idl for the msnotify.idl
+//              private interfaces are in this idl file
+//
+//----------------------------------------------------------------------------
+import "msnotify.idl";
+#pragma midl_echo("#include <msnotify.h>             ")
+
+
+//
+// private interface; used by notfmgr only
+//
+cpp_quote("#ifndef _LPNOTIFICATIONRUNNING_DEFINED")
+cpp_quote("#define _LPNOTIFICATIONRUNNING_DEFINED")
+
+[
+        local,
+        object,
+        uuid(c733e4ad-576e-11d0-b28c-00c04fd7cd22),
+        pointer_default(unique)
+]
+
+interface INotificationRunning : IUnknown
+{
+        typedef [unique] INotificationRunning *LPNOTIFICATIONRUNNING;
+
+}
+cpp_quote("#endif")
+
+//
+// this interface is not public yet
+//
+cpp_quote("#ifndef _LPNOTIFICATIONPROCESSMGR0_DEFINED")
+cpp_quote("#define _LPNOTIFICATIONPROCESSMGR0_DEFINED")
+
+[
+        local,
+        object,
+        uuid(c733e4ae-576e-11d0-b28c-00c04fd7cd22),
+        pointer_default(unique)
+]
+
+interface INotificationProcessMgr0 : IUnknown
+{
+        typedef [unique] INotificationProcessMgr0 *LPNOTIFICATIONPROCESSMGR0;
+
+
+        typedef enum _tagNOTIFICATIONMGRMODE
+        {
+            // **** FLAGS OF THE NOTIFICATIONMGR ***
+            //
+            // the normal mode is to deliver imedialty
+            // and async (postmessage to enter thread
+            // of destination
+
+            // this process is the default process
+            NM_DEFAULT_PROCESS        = 0x00000001
+
+            // set this thread as the default thread of this process
+           ,NM_DEFAULT_THREAD         = 0x00000002
+
+        } _NOTIFICATIONMGRMODE;
+
+        typedef DWORD NOTIFICATIONMGRMODE;
+
+        HRESULT SetMode(
+            // the clsid of the process
+            [in]    REFCLSID                rClsID,
+            // initialization mode
+            [in]    NOTIFICATIONMGRMODE     NotificationMgrMode,
+            // out previous default notification mgr
+            [out]   LPCLSID                *pClsIDPre,
+            // a reserved again
+            [in]    DWORD                   dwReserved
+            );
+
+        //
+        //
+        //
+        typedef enum _tagTHROTTLE_ITEMS_FLAGS
+        {
+            // do not deliver a scheduled item with this type
+             TF_DONT_DELIVER_SCHEDULED_ITEMS    = 0x00000001
+            // apply the time range of the structur; do not deliver during that range
+            ,TF_APPLY_EXCLUDE_RANGE             = 0x00000002
+            // items should not be delivered in shorter time distance as specified in
+            // the dwMinItemUpdateInterval in minutes
+            ,TF_APPLY_UPDATEINTERVAL            = 0x00000004
+
+        } _THROTTLE_ITEMS_FLAGS;
+
+        typedef DWORD THROTTLE_ITEMS_FLAGS;
+
+        typedef struct THROTTLEITEM
+        {
+            // type of notification to be throttled
+            NOTIFICATIONTYPE    NotificationType;
+            // maximum intances running parallel
+            LONG                nParallel;
+            // mode flag: TBD
+            DWORD               dwFlags;
+            // begin time it can run
+            SYSTEMTIME          stBegin;
+            // end time it can run
+            SYSTEMTIME          stEnd;
+            // the mimimum update interval in minutes
+            DWORD               dwMinItemUpdateInterval;
+        } THROTTLEITEM, *PTHROTTLEITEM;
+
+        HRESULT RegisterThrottleNotificationType(
+            [in]        ULONG               cItems,
+            [in, size_is(cItems)]
+                        PTHROTTLEITEM       pThrottleItems,
+            [out]       ULONG              *pcItemsOut,
+            [out]       PTHROTTLEITEM      *ppThrottleItemsOut,
+            [in]        DWORD               dwMode,
+            [in]        DWORD               dwReserved
+            );
+
+
+}
+cpp_quote("#endif")
+
+//
+// unimplemented deliver modes
+//
+cpp_quote("#define DM_SYNCHRONOUS              0x00000010       ")
+cpp_quote("#define DM_ONLY_IF_NOT_PENDING      0x00001000       ")
+
+

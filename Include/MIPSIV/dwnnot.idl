@@ -1,0 +1,99 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+//+---------------------------------------------------------------------------
+//
+//
+//  File:       dwnnot.idl
+//
+//  Contents:   IDownloadNotify interfaces
+//
+//  Classes:
+//
+//  Functions:
+//
+//
+//----------------------------------------------------------------------------
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//---------------------------------------------------------------------------=")
+cpp_quote("// IDownloadNotify Interface.")
+cpp_quote("")
+
+import "objidl.idl";
+import "oleidl.idl";
+
+interface IDownloadNotify;
+
+//+---------------------------------------------------------------------------
+//
+//  Copyright (C) Microsoft Corporation, 1995-1998.
+//
+//  Contents:  IDownloadNotify interface definition
+//
+//----------------------------------------------------------------------------
+
+
+// IOleCommandTarget command group GUID and command IDs
+
+
+cpp_quote("EXTERN_C const GUID CGID_DownloadHost;")
+
+cpp_quote("#ifndef _LPDOWNLOADHOST_CMDID_DEFINED")
+cpp_quote("#define _LPDOWNLOADHOST_CMDID_DEFINED")
+
+cpp_quote("#define DWNHCMDID_SETDOWNLOADNOTIFY (0)")
+
+cpp_quote("#endif")
+
+
+cpp_quote("#ifndef _LPDOWNLOADNOTIFY_DEFINED")
+cpp_quote("#define _LPDOWNLOADNOTIFY_DEFINED")
+
+cpp_quote("#define DWNTYPE_HTM     0")
+cpp_quote("#define DWNTYPE_IMG     1")
+cpp_quote("#define DWNTYPE_BITS    2")
+cpp_quote("#define DWNTYPE_FILE    3")
+
+
+[local, object, uuid(caeb5d28-ae4c-11d1-ba40-00c04fb92d79), pointer_default(unique)]
+interface IDownloadNotify : IUnknown
+{
+	typedef [unique] IDownloadNotify *LPDOWNLOADNOTIFY;
+
+    // Called when a download is about to begin; return E_ABORT to avoid download
+    HRESULT DownloadStart(
+            [in]                    LPCWSTR pchUrl,         // may be NULL if URL is unspecified
+            [in]                    DWORD dwDownloadId,
+            [in]                    DWORD dwType,
+            [in]                    DWORD dwReserved);
+
+    // Called when a download is finished; even called if download was aborted at DownloadStart
+    HRESULT DownloadComplete(
+            [in]                    DWORD dwDownloadId,
+            [in]                    HRESULT hrNotify,
+            [in]                    DWORD dwReserved);
+}
+
+cpp_quote("#endif")
+
+

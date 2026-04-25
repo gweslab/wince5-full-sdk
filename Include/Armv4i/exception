@@ -1,0 +1,78 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+/***
+*
+* exception - Defines the type_info structure and exceptions used for RTTI
+*
+*
+*Purpose:
+*       Defines the exception class and handler functions
+*
+*Revision History:
+*       02/10/01  PT    Created
+*
+****/
+
+#if     _MSC_VER > 1000 /*IFSTRIP=IGN*/
+#pragma once
+#endif
+
+#ifndef __cplusplus
+#error This header requires a C++ compiler ...
+#endif
+
+#ifndef _INC_EXCEPTION
+#define _INC_EXCEPTION
+
+#include <libdefs>
+
+// Make sure of good packing
+#pragma pack(push,8)
+
+_STDDEFS_BEGIN
+
+// Base class for all exceptions
+class _CRTIMP exception {
+public:
+    exception() throw();
+    exception(const char*) throw();
+    exception(const exception&) throw();
+    exception& operator= (const exception&) throw();
+    virtual ~exception() throw();
+    virtual const char* what() const throw();
+private:
+    const char* _m_what;
+    int _m_doFree;
+};
+
+class _CRTIMP bad_exception : public exception {
+public:
+    bad_exception(const char* w = "bad exception") throw() : exception(w) {
+    }
+    virtual ~bad_exception() throw() {
+    }
+};
+
+typedef void (*unexpected_handler)();
+unexpected_handler set_unexpected(unexpected_handler);
+void unexpected();
+
+typedef void (*terminate_handler)();
+terminate_handler set_terminate(terminate_handler);
+void terminate();
+
+bool uncaught_exception();
+
+_STDDEFS_END
+
+#pragma pack(pop)
+
+#endif  // _INC_EXCEPTION

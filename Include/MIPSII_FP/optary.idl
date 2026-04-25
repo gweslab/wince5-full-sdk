@@ -1,0 +1,95 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+//+---------------------------------------------------------------------------
+//
+//  Contents:   IOptionArray interfaces
+//
+//  Classes:
+//
+//  Functions:
+//
+//----------------------------------------------------------------------------
+
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//---------------------------------------------------------------------------=")
+cpp_quote("// IOptionArray Interface.")
+cpp_quote("")
+
+import "objidl.idl";
+import "oleidl.idl";
+
+interface IOptionArray;
+
+//+---------------------------------------------------------------------------
+//
+//  Copyright (C) Microsoft Corporation, 1995-1998.
+//
+//  Contents:  IOptionArray interface definition
+//
+//----------------------------------------------------------------------------
+
+cpp_quote("#ifndef _LPOPTIONARRAY_DEFINED")
+cpp_quote("#define _LPOPTIONARRAY_DEFINED")
+
+[local, object, uuid(22b6d492-0f88-11d1-ba19-00c04fd912d0), pointer_default(unique)]
+interface IOptionArray : IUnknown
+{
+	typedef [unique] IOptionArray *LPOPTIONARRAY;
+
+    HRESULT QueryOption(
+            [in]                    DWORD  dwOption,
+            [out, size_is(*pcbBuf)] LPVOID pBuffer,
+            [in, out]               ULONG *pcbBuf);
+
+    HRESULT SetOption(
+            [in]                    DWORD dwOption,
+            [in, size_is(cbBuf)]    LPVOID pBuffer,
+            [in]                    ULONG cbBuf);
+}
+
+//+---------------------------------------------------------------------------
+//
+//  Copyright (C) Microsoft Corporation, 1995-1998.
+//
+//  Contents:  IHtmlLoadOptions interface definition
+//
+//----------------------------------------------------------------------------
+
+cpp_quote("// HTMLLoadOptions CLSID")
+cpp_quote("EXTERN_C const CLSID CLSID_HTMLLoadOptions; // {18845040-0fa5-11d1-ba19-00c04fd912d0}")
+
+[local, object, uuid(a71a0808-0f88-11d1-ba19-00c04fd912d0), pointer_default(unique)]
+interface IHtmlLoadOptions : IOptionArray
+{
+    typedef enum
+    {
+        HTMLLOADOPTION_CODEPAGE         = 0x00000000, // default codepage, 4 bytes
+        HTMLLOADOPTION_INETSHORTCUTPATH = 0x00000001, // Path to Shortcut, Wide Char String Variable size
+        HTMLLOADOPTION_HYPERLINK        = 0x00000002, // true if true hyperlink load (not init subframe load), 4 bytes
+        HTMLLOADOPTION_FRAMELOAD        = 0x00000003, // unused - to be removed
+    } HTMLLOADOPTION;
+}
+
+cpp_quote("#endif")
+

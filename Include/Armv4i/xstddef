@@ -1,0 +1,64 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+/*
+ xstddef standard header
+*/
+
+#if     _MSC_VER > 1000 /*IFSTRIP=IGN*/
+#pragma once
+#endif
+
+#ifndef _XSTDDEF_
+#define _XSTDDEF_
+#ifndef _YVALS
+ #include <yvals.h>
+#endif
+#include <cstddef>
+
+#ifdef  _MSC_VER
+#pragma pack(push,8)
+#endif  /* _MSC_VER */
+_STD_BEGIN
+		// EXCEPTION MACROS
+#define _TRY_BEGIN	try {
+#define _CATCH(x)	} catch (x) {
+#define _CATCH_ALL	} catch (...) {
+#define _CATCH_END	}
+#define _RAISE(x)	throw (x)
+#define _RERAISE	throw
+
+		// explicit KEYWORD
+		// BITMASK MACROS
+ #define _BITMASK(E, T)	typedef int T
+ #define _BITMASK_OPS(T)
+		// MISCELLANEOUS MACROS
+#define _DESTRUCTOR(ty, ptr)	(ptr)->~ty()
+#define _PROTECTED	public
+ #define _TDEF(x)		= x
+ #define _TDEF2(x, y)	= x, y
+ #define _CNTSIZ(iter)	ptrdiff_t
+ #define _TDEFP(x)
+ #define _STCONS(ty, name, val)	enum {name = val}
+		// TYPE DEFINITIONS
+enum _Uninitialized {_Noinit};
+_CRTIMP void __cdecl _Nomemory();
+_STD_END
+#ifdef  _MSC_VER
+#pragma pack(pop)
+#endif  /* _MSC_VER */
+
+#endif /* _XSTDDEF_ */
+
+/*
+ * Copyright (c) 1995 by P.J. Plauger.  ALL RIGHTS RESERVED. 
+ * Consult your license regarding permissions and restrictions.
+ */

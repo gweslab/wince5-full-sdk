@@ -1,0 +1,342 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+/*----------------------------------------------------------------------------
+    remoteui.idl
+        Interface definitions for a remote (HTTP based) UI
+
+        This file will be processed by the MIDL tool to
+        produce the type library (remoteui.tlb) and marshalling code.
+
+    All rights reserved.
+ ----------------------------------------------------------------------------*/
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+    
+interface IRemoteUIModule;
+interface IVariableContainer;
+interface IRemoteUI_Array;
+
+
+   
+    [
+        object,
+        uuid(5863AB80-48BB-4962-A015-442806B7F470),
+        helpstring(""),
+        pointer_default(unique)
+    ]
+    interface IRemoteUI_Array : IUnknown {
+
+		[helpstring("")]
+        HRESULT GetName([out] char **pName);          
+	
+		[helpstring("")]
+		HRESULT AddValue([in] const char *pIndex, [in] VARIANT *pValue);
+
+		[helpstring("")]	
+		HRESULT GetValue([in] const char *pIndex, [out] VARIANT **pValue);
+
+		[helpstring("")]
+		HRESULT FindFirstVar([out] char **pIndex, [out] VARIANT **pValue);
+
+		[helpstring("")]
+		HRESULT FindNextVar([out] char **pIndex, [out] VARIANT **pValue);
+    };
+
+
+    [
+        object,
+        uuid(0FDACCB6-6ADE-49ff-B281-93E9470211BD),
+        helpstring("Container for variables"),
+        pointer_default(unique)
+    ]
+    interface IVariableContainer : IUnknown
+    {
+		[helpstring("")]
+		HRESULT AddArray([in] const char *pName, [out] IRemoteUI_Array **pArray);
+
+		[helpstring("")]
+		HRESULT GetArray([in] const char *pName, [out] IRemoteUI_Array **pArray);
+
+		[helpstring("")]
+		HRESULT AddValue([in] const char *pName, [in] VARIANT *pValue);		
+
+		[helpstring("")]
+		HRESULT GetValue([in] const char *pName, [out] VARIANT **pValue);
+	
+		[helpstring("")]
+		HRESULT FindFirstVar([out] char **pName, [out] VARIANT **pValue);
+
+		[helpstring("")]
+		HRESULT FindNextVar([out] char **pName, [out] VARIANT **pValue);
+
+		[helpstring("")]
+		HRESULT FindFirstArray([out] IRemoteUI_Array **pArray);
+
+		[helpstring("")]
+		HRESULT FindNextArray([out] IRemoteUI_Array **pArray);
+    };
+      
+
+
+    
+    [
+        object,
+        uuid(0C4CD7CF-D667-4198-86E8-5254545311E9),
+        helpstring("RemoteUI Main Module Interface"),
+        pointer_default(unique)
+    ]
+    interface IRemoteUIModule : IUnknown
+    {
+        [helpstring("")]
+        HRESULT Get([in] BOOL fForBackup, [in] IVariableContainer *pToServer);
+
+        [helpstring("")]
+        HRESULT Put([in] BOOL fForRestore, [in] IVariableContainer *pFromServer, [in] IVariableContainer *pReturn);
+
+        [helpstring("")]
+        HRESULT NeedNetworkRestart([out] BOOL *pVal);
+
+        [helpstring("")]
+        HRESULT NeedHTTPDRestart([out] BOOL *pVal);
+
+        [helpstring("")]
+        HRESULT ModuleName ([out] char **pModuleName);
+
+        [helpstring("")]
+        HRESULT Reset ();
+
+        [helpstring("")]
+        HRESULT Init([in] const char *pInitArgs);
+	
+    };
+   
+      	 
+
+
+[
+        uuid(2A289FBD-9D86-4e37-866C-934685F4B611),
+        version(1.0),
+        helpstring("RemoteUI 1.0 Type Library")
+]
+library ModulesLib
+    {
+        importlib("stdole32.tlb");
+        importlib("stdole2.tlb");
+
+
+        [
+            uuid(47994745-090f-4d1d-85f3-ce2a48b09c6d),
+            helpstring("Parental Controls Module")
+        ]
+        coclass PC
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        }
+
+        [
+            uuid(DE65D164-B2B5-4406-8B75-949DAAC17AA7),
+            helpstring("Firewall Module")
+        ]
+        coclass Firewall
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+		[
+        uuid(BB37C343-7B67-4036-AA6E-1FEF373FBF20),
+            helpstring("HostName Module")
+        ]
+        coclass HostName
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+		[
+            uuid(D0AF5AA8-A2DC-42de-9D76-4C54DAFC9FA4),
+            helpstring("NAT Module")
+        ]
+        coclass NAT
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+    
+
+        [
+            uuid(3333E916-2E01-400d-9635-DC70EE608B69),
+            helpstring("Netlog Module")
+        ]
+        coclass NetLog
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+		[
+        	uuid(D81B0FA6-930A-4dbb-9530-81FA0CD184FC),
+            helpstring("Network Module")
+        ]
+        coclass Network
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+        [
+            uuid(FF4CF2D7-608A-487a-82EF-B3714191FA59),
+            helpstring("Password Module")
+        ]
+        coclass Password
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+		[
+            uuid(31BE9AC6-AF5B-4f8a-83C5-65512CA9974E),
+            helpstring("PortForward Module")
+        ]
+        coclass PortForward
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+        [
+            uuid(E6020113-0323-421e-BCA3-84E2D1EDC3EA),
+            helpstring("RootDir Module")
+        ]
+
+        coclass RootDirs
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+        [
+            uuid(834ea022-ea02-41e6-95d9-314608e2a023),
+            helpstring("RAS Module")
+        ]
+        coclass RAS
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+		[
+            uuid(BE7DB45C-0C6E-4c93-A575-CED8319B0B17),
+            helpstring("SMBFile Module")
+        ]
+        coclass SMBFile
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+		[
+            uuid(729017DF-7E9A-45e7-9EEE-BFDD378B21BF),
+            helpstring("SMBPrint Module")
+        ]
+        coclass SMBPrint
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+ 		[
+            uuid(C1E176E4-0A1F-45f2-B8CC-A9CB177FA44E),
+            helpstring("User Module")
+        ]
+        coclass UserManager
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+        
+        [
+            uuid(E178FF56-18A3-437f-AAA9-DB9E12FAB808),
+            helpstring("Version Module")
+        ]
+        coclass Version
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+        [
+            uuid(0F4901FF-317D-45b1-B2EC-529570FD8571),
+            helpstring("TimeService Module")
+        ]
+        coclass TimeService
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+        [
+            uuid(9D752B54-CCD8-4916-B953-1D28CA614BC5),
+            helpstring("Localization Module")
+        ]
+        coclass Loc
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+        [
+            uuid(763f0f42-0ced-4e9f-9623-0c2835c86609),
+            helpstring("Nativewifi Module")
+        ]
+        coclass NWIFI
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+        [
+            uuid(734040d9-a825-4640-8c09-52273e5108cd),
+            helpstring("EventLog Module")
+        ]
+        coclass EventLog
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+
+
+        [
+            uuid(F3563900-D4A7-48e7-AFE8-D444BCFEEDC2),
+            helpstring("Watson Module")
+        ]
+        coclass Watson
+        {
+            [default] interface IRemoteUIModule;
+            interface IRemoteUIModule;
+        };
+     };
+
+

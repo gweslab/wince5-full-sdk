@@ -1,0 +1,84 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+/****
+*
+* new - Declares classes and operators for dynammic memory management.
+*
+*
+*Revision History:
+*       02/13/01  CB    Created - document what is now exported
+*
+****/
+
+#if     _MSC_VER > 1000 /*IFSTRIP=IGN*/
+#pragma once
+#endif
+
+#ifndef __cplusplus
+#error This header requires a C++ compiler ...
+#endif
+
+#ifndef _INC_NEW
+#define _INC_NEW
+
+#include <libdefs>
+#include <exception>
+
+// Make sure of good packing
+#pragma pack(push,8)
+
+_STDDEFS_BEGIN
+
+class _CRTIMP bad_alloc : public exception {
+public:
+    bad_alloc(const char* what_arg = "bad allocation") throw()
+		: exception (what_arg) {}
+    virtual ~bad_alloc() throw()
+		{}
+};
+
+struct _CRTIMP nothrow_t {};
+extern _CRTIMP const nothrow_t nothrow;
+
+_STDDEFS_END
+
+typedef void (*new_handler) ();
+_CRTIMP new_handler set_new_handler(new_handler new_p) throw();
+
+_CRTIMP void * operator new(unsigned int) throw(std::bad_alloc);
+_CRTIMP void * operator new[](unsigned int) throw(std::bad_alloc);
+
+_CRTIMP void * operator new(unsigned int,struct std::nothrow_t const &) throw();
+_CRTIMP void * operator new[](unsigned int,struct std::nothrow_t const &) throw();
+
+_CRTIMP void operator delete(void *) throw();
+_CRTIMP void operator delete[]( void *) throw();
+
+_CRTIMP void operator delete(void *,struct std::nothrow_t const &) throw();
+_CRTIMP void operator delete[]( void *,struct std::nothrow_t const &) throw();
+
+#ifndef __PLACEMENT_NEW_INLINE
+#define __PLACEMENT_NEW_INLINE
+inline void *__cdecl operator new(size_t, void *_P)
+    {return (_P); }
+inline void __cdecl operator delete(void *, void *)
+    {return; }
+inline void *__cdecl operator new[](size_t, void *_P)
+    {return (_P); }
+inline void __cdecl operator delete[](void *, void *) 
+    {   // delete if placement array new fails
+    }
+#endif
+//end of vbug 10417 checkin
+
+#pragma pack(pop)
+
+#endif // _INC_NEW

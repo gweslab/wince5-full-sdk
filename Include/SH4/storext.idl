@@ -1,0 +1,131 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+
+//+-------------------------------------------------------------------------
+//
+//
+//  File: OleStor.idl  Cairo only interfaces for OLE Storage
+//
+//  Contents: IOverlappedStream interface definition
+//
+//
+//--------------------------------------------------------------------------
+
+cpp_quote("#if ( _MSC_VER >= 1020 )")
+cpp_quote("#pragma once")
+cpp_quote("#endif")
+
+#ifndef DO_NO_IMPORTS
+import "wtypes.idl";
+import "unknwn.idl";
+import "objidl.idl";
+#endif
+
+typedef [wire_marshal(ULONG)] void * HEVENT;
+interface IOverlappedCompletion;
+
+typedef struct _STGOVERLAPPED {
+    DWORD   Internal;
+    DWORD   InternalHigh;
+    DWORD   Offset;
+    DWORD   OffsetHigh;
+    HEVENT  hEvent;
+    IOverlappedCompletion * lpCompletion;
+    DWORD   reserved;
+} STGOVERLAPPED, *LPSTGOVERLAPPED;
+
+//+-------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 1995-1999.
+//
+//  Contents: IOverlappedCompletion interface definition
+//
+//  History:    14-Sep-1995 HenryLee    initial version
+//
+//--------------------------------------------------------------------------
+[
+    object,
+    uuid(521a28f0-e40b-11ce-b2c9-00aa00680937),
+    pointer_default(unique)
+]
+interface IOverlappedCompletion : IUnknown
+{
+    HRESULT OnComplete (
+        [in] HRESULT hr,
+        [in] DWORD pcbTransferred,
+        [in] STGOVERLAPPED *lpOverlapped);
+}
+
+//+-------------------------------------------------------------------------
+//
+//  Microsoft Windows
+//  Copyright (C) Microsoft Corporation, 1995-1999.
+//
+//  Contents: IOverlappedStream interface definition
+//
+//  History:    14-Sep-1995 HenryLee    initial version
+//
+//--------------------------------------------------------------------------
+[
+    object,
+    uuid(49384070-e40a-11ce-b2c9-00aa00680937),
+    pointer_default(unique)
+]
+interface IOverlappedStream : IStream
+{
+
+    [local]
+    HRESULT ReadOverlapped (
+                [in, size_is(cb)] void * pv,
+                [in] ULONG cb,
+                [out] ULONG * pcbRead,
+                [in] STGOVERLAPPED *lpOverlapped);
+
+    [call_as(ReadOverlapped)]
+    HRESULT RemoteReadOverlapped (
+                [in, size_is(cb)] byte * pv,
+                [in] ULONG cb,
+                [out] ULONG * pcbRead,
+                [in] STGOVERLAPPED *lpOverlapped);
+
+
+    [local]
+    HRESULT __stdcall WriteOverlapped (
+                [in, size_is(cb)] void *pv,
+                [in] ULONG cb,
+                [out] ULONG * pcbWritten,
+                [in] STGOVERLAPPED *lpOverlapped);
+
+    [call_as(WriteOverlapped)]
+    HRESULT __stdcall RemoteWriteOverlapped (
+                [in, size_is(cb)] byte *pv,
+                [in] ULONG cb,
+                [out] ULONG * pcbWritten,
+                [in] STGOVERLAPPED *lpOverlapped);
+
+    HRESULT GetOverlappedResult (
+                [in, out] STGOVERLAPPED *lpOverlapped,
+                [out] DWORD * plcbTransfer,
+                [in] BOOL fWait);
+
+}

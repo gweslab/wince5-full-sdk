@@ -1,0 +1,59 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+//+-------------------------------------------------------------------------
+//
+//  Contents: IMimeInfo interface definition
+//
+//
+//--------------------------------------------------------------------------
+
+
+cpp_quote("")
+cpp_quote("#pragma comment(lib,\"uuid.lib\")")
+cpp_quote("")
+cpp_quote("//--------------------------------------------------------------------------")
+cpp_quote("// IMimeInfo Interfaces.")
+cpp_quote("")
+
+import "objidl.idl";
+
+[
+  local,
+  object,
+  uuid(F77459A0-BF9A-11cf-BA4E-00C04FD70816),
+  pointer_default(unique)
+]
+interface IMimeInfo : IUnknown
+{
+
+    typedef [unique] IMimeInfo *LPMIMEINFO;
+
+    HRESULT GetMimeCLSIDMapping
+    (
+        [out] UINT      *pcTypes,
+        [out] LPCSTR  * *ppszTypes,
+        [out] CLSID   * *ppclsID
+    );
+
+}
+
+cpp_quote("#define SID_IMimeInfo IID_IMimeInfo")

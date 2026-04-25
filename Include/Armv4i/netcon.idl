@@ -1,0 +1,339 @@
+//
+// Copyright (c) Microsoft Corporation.  All rights reserved.
+//
+//
+// Use of this source code is subject to the terms of the Microsoft end-user
+// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.
+// If you did not accept the terms of the EULA, you are not authorized to use
+// this source code. For a copy of the EULA, please see the LICENSE.RTF on your
+// install media.
+//
+
+cpp_quote("//")
+cpp_quote("// Copyright (c) Microsoft Corporation.  All rights reserved.")
+cpp_quote("//")
+cpp_quote("//")
+cpp_quote("// Use of this source code is subject to the terms of the Microsoft end-user")
+cpp_quote("// license agreement (EULA) under which you licensed this SOFTWARE PRODUCT.")
+cpp_quote("// If you did not accept the terms of the EULA, you are not authorized to use")
+cpp_quote("// this source code. For a copy of the EULA, please see the LICENSE.RTF on your")
+cpp_quote("// install media.")
+cpp_quote("//")
+
+cpp_quote("#if ( _MSC_VER >= 800 )")
+cpp_quote("#pragma warning(disable:4201)")
+cpp_quote("#endif")
+
+#ifndef DO_NO_IMPORTS
+import "unknwn.idl";
+import "wtypes.idl";
+import "prsht.idl";
+#endif
+
+cpp_quote("")
+cpp_quote("EXTERN_C const CLSID CLSID_ConnectionManager;")
+cpp_quote("EXTERN_C const CLSID CLSID_ConnectionCommonUi;")
+cpp_quote("")
+cpp_quote("//These strings reference the HKEY_CURRENT_USER registry which")
+cpp_quote("//retains whether shortcuts are created on the desktop.")
+cpp_quote("#define NETCON_HKEYCURRENTUSERPATH      TEXT(\"Software\\\\Microsoft\\\\Windows NT\\\\CurrentVersion\\\\Network\\\\Network Connections\")")
+cpp_quote("#define NETCON_DESKTOPSHORTCUT          TEXT(\"DesktopShortcut\")")
+cpp_quote("#define NETCON_MAX_NAME_LEN 246")
+cpp_quote("")
+
+// Reserved GUIDS for our use
+//
+// C08956A0-1CD3-11D1-B1C5-00805FC1270E     IID_IEnumNetConnection
+// C08956A1-1CD3-11D1-B1C5-00805FC1270E     IID_INetConnection
+// C08956A2-1CD3-11D1-B1C5-00805FC1270E     IID_INetConnectionManager
+// C08956A3-1CD3-11D1-B1C5-00805FC1270E     IID_INetConnectionConnectUi
+// C08956A4-1CD3-11D1-B1C5-00805FC1270E     IID_INetConnectionPropertyUi
+// C08956A5-1CD3-11D1-B1C5-00805FC1270E     IID_INetConnectionCommonUi
+// C08956A6-1CD3-11D1-B1C5-00805FC1270E     IID_INetLanConnectionUiInfo
+// ...
+// C08956FE-1CD3-11D1-B1C5-00805FC1270E
+// C08956FF-1CD3-11D1-B1C5-00805FC1270E
+// C0895700-1CD3-11D1-B1C5-00805FC1270E
+//
+
+interface IEnumNetConnection;
+interface INetConnection;
+interface INetConnectionManager;
+interface INetConnectionConnectUi;
+interface INetConnectionPropertyUi;
+interface INetConnectionCommonUi;
+interface INetLanConnectionUiInfo;
+
+
+//+---------------------------------------------------------------------------
+// IEnumNetConnection - An enumerator for INetConnection objects.
+//
+[
+    object,
+    uuid(C08956A0-1CD3-11D1-B1C5-00805FC1270E),
+    pointer_default(unique)
+]
+interface IEnumNetConnection : IUnknown
+{
+    HRESULT Next(
+        [in] ULONG celt,
+        [out, size_is(celt), length_is(*pceltFetched)]
+        INetConnection** rgelt,
+        [out] ULONG* pceltFetched);
+
+    HRESULT Skip(
+        [in] ULONG celt);
+
+    HRESULT Reset();
+
+    HRESULT Clone(
+        [out] IEnumNetConnection** ppenum);
+};
+
+
+//+---------------------------------------------------------------------------
+// INetConnection -
+//
+[
+    object,
+    uuid(C08956A1-1CD3-11D1-B1C5-00805FC1270E),
+    pointer_default(unique)
+]
+interface INetConnection : IUnknown
+{
+    typedef enum tagNETCON_CHARACTERISTIC_FLAGS
+    {
+        NCCF_NONE               = 0x0000,   // No special characteristics
+        NCCF_ALL_USERS          = 0x0001,   // Connection is available to all users
+        NCCF_ALLOW_DUPLICATION  = 0x0002,   // Connection is duplicable
+        NCCF_ALLOW_REMOVAL      = 0x0004,   // Connection is removable
+        NCCF_ALLOW_RENAME       = 0x0008,   // Connection can be renamed
+        NCCF_SHOW_ICON          = 0x0010,   // Shows icon in taskbar when connected
+        NCCF_INCOMING_ONLY      = 0x0020,   // Direction is "incoming" only
+        NCCF_OUTGOING_ONLY      = 0x0040,   // Direction is "outgoing" only
+        NCCF_BRANDED            = 0x0080,   // Icons are branded
+    } NETCON_CHARACTERISTIC_FLAGS;
+
+    typedef enum tagNETCON_STATUS
+    {
+        NCS_DISCONNECTED,
+        NCS_CONNECTING,
+        NCS_CONNECTED,
+        NCS_DISCONNECTING,
+        NCS_HARDWARE_NOT_PRESENT,
+        NCS_HARDWARE_DISABLED,
+        NCS_HARDWARE_MALFUNCTION,
+        NCS_MEDIA_DISCONNECTED
+    } NETCON_STATUS;
+
+    typedef enum tagNETCON_TYPE
+    {
+        NCT_DIRECT_CONNECT,
+        NCT_INBOUND,
+        NCT_INTERNET,
+        NCT_LAN,
+        NCT_PHONE,
+        NCT_TUNNEL,
+    } NETCON_TYPE;
+
+    typedef enum tagNETCON_MEDIATYPE
+    {
+        NCM_NONE,
+        NCM_DIRECT,
+        NCM_ISDN,
+        NCM_LAN,
+        NCM_PHONE,
+        NCM_TUNNEL,
+    } NETCON_MEDIATYPE;
+
+    typedef struct tagNETCON_PROPERTIES
+    {
+                 GUID               guidId;
+        [string] LPWSTR             pszwName;
+        [string] LPWSTR             pszwDeviceName;
+                 NETCON_STATUS      Status;
+                 NETCON_MEDIATYPE   MediaType;
+                 DWORD              dwCharacter;
+                 CLSID              clsidThisObject;
+                 CLSID              clsidUiObject;
+    } NETCON_PROPERTIES;
+
+    HRESULT Connect();
+
+cpp_quote("#define S_OBJECT_NO_LONGER_VALID ((HRESULT)0x00000002L)")
+
+    // Disconnect can return S_OBJECT_NO_LONGER_VALID which indicates
+    // success, but that the object is no longer valid.  Clients, when
+    // getting this error message, should simply release the interface.
+    //
+    HRESULT Disconnect();
+
+    HRESULT Delete();
+
+    HRESULT Duplicate(
+        [in, string] LPCWSTR    pszwDuplicateName,
+        [out] INetConnection**  ppCon);
+
+    HRESULT GetProperties(
+        [out] NETCON_PROPERTIES** ppProps);
+
+    HRESULT GetUiObjectClassId(
+        [out, ref] CLSID* pclsid);
+
+    HRESULT Rename(
+        [in, string] LPCWSTR pszwNewName);
+};
+
+cpp_quote("")
+cpp_quote("STDAPI_(VOID) NcFreeNetconProperties (NETCON_PROPERTIES* pProps);")
+cpp_quote("")
+
+cpp_quote("")
+cpp_quote("STDAPI_(BOOL) NcIsValidConnectionName (PCWSTR pszwName);")
+cpp_quote("")
+
+
+//+---------------------------------------------------------------------------
+// INetConnectionManager - The top-level object that contains all of the
+//      INetConnection objects on a machine.
+//
+// This interface manages INetConnection objects.  It provides methods
+// to:
+//     - Enumerate INetConnections
+//     - Remove an INetConnection
+//     - Find an INetConnection
+//
+// Note: Adding a connection is not yet performed programatically through
+// the connection manager.  Instead, the shell owns creating connection
+// objects through a UI interface.
+//
+[
+    object,
+    uuid(C08956A2-1CD3-11D1-B1C5-00805FC1270E),
+    pointer_default(unique)
+]
+interface INetConnectionManager : IUnknown
+{
+    typedef enum tagNETCONMGR_ENUM_FLAGS
+    {
+        NCME_DEFAULT = 0x0,
+    } NETCONMGR_ENUM_FLAGS;
+
+    // Return an IEnumNetConnection interface used to enumerate all of
+    // the contained connection objects.
+    //
+    HRESULT EnumConnections(
+        [in] NETCONMGR_ENUM_FLAGS   Flags,
+        [out] IEnumNetConnection**  ppEnum);
+};
+
+
+//+---------------------------------------------------------------------------
+// INetConnectionConnectUi -
+//
+[
+    local,
+    object,
+    uuid(C08956A3-1CD3-11D1-B1C5-00805FC1270E),
+    pointer_default(unique)
+]
+interface INetConnectionConnectUi : IUnknown
+{
+    typedef enum tagNETCONUI_CONNECT_FLAGS
+    {
+        NCUC_DEFAULT    = 0x0000,
+        NCUC_NO_UI      = 0x0001,
+    } NETCONUI_CONNECT_FLAGS;
+
+    HRESULT SetConnection(
+        [in] INetConnection* pCon);
+
+    HRESULT Connect (
+        [in] HWND hwndParent,
+        [in] DWORD dwFlags);
+
+    HRESULT Disconnect (
+        [in] HWND hwndParent,
+        [in] DWORD dwFlags);
+};
+
+
+//+---------------------------------------------------------------------------
+// INetConnectionPropertyUi -
+//
+[
+    local,
+    object,
+    uuid(C08956A4-1CD3-11D1-B1C5-00805FC1270E),
+    pointer_default(unique)
+]
+interface INetConnectionPropertyUi : IUnknown
+{
+    HRESULT SetConnection(
+        [in] INetConnection* pCon);
+
+    HRESULT AddPages (
+        [in] HWND hwndParent,
+        [in] LPFNADDPROPSHEETPAGE pfnAddPage,
+        [in] LPARAM lParam);
+};
+
+//+---------------------------------------------------------------------------
+// INetConnectionCommonUi -
+//
+[
+    local,
+    object,
+    uuid(C08956A5-1CD3-11D1-B1C5-00805FC1270E),
+    pointer_default(unique)
+]
+interface INetConnectionCommonUi : IUnknown
+{
+    typedef enum tagNETCON_CHOOSEFLAGS
+    {
+        NCCHF_CONNECT    = 0x0001,      // Selected Connection is activated
+                                        // and returned. If not set then
+                                        // the selected connection interface
+                                        // is returned without being activated
+        NCCHF_CAPTION    = 0x0002,
+        NCCHF_OKBTTNTEXT = 0x0004,
+        NCCHF_DISABLENEW = 0x0008,
+        NCCHF_AUTOSELECT = 0x0010,      // Automatically Choose or Connect,
+                                        // based upon NCCHF_CONNECT if only
+                                        // one connection matches the
+                                        // dwTypeMask.
+    } NETCON_CHOOSEFLAGS;
+
+    typedef enum tagNETCON_CHOOSETYPE
+    {
+        NCCHT_DIRECT_CONNECT = 0x0001,
+        NCCHT_LAN            = 0x0002,
+        NCCHT_PHONE          = 0x0004,
+        NCCHT_TUNNEL         = 0x0008,
+        NCCHT_ISDN           = 0x0010,
+        NCCHT_ALL            = 0x001F
+    } NETCON_CHOOSETYPE;
+
+    typedef struct tagNETCON_CHOOSECONN
+    {
+        DWORD       lStructSize;
+        HWND        hwndParent;
+        DWORD       dwFlags;            // Combine NCCHF_* flags
+        DWORD       dwTypeMask;         // Combine NCCHT_* flags
+        LPCWSTR     lpstrCaption;
+        LPCWSTR     lpstrOkBttnText;
+    } NETCON_CHOOSECONN;
+
+    HRESULT ChooseConnection(
+        [in] NETCON_CHOOSECONN * pChooseConn,
+        [out] INetConnection** ppCon);
+
+    HRESULT ShowConnectionProperties (
+        [in] HWND hwndParent,
+        [in] INetConnection* pCon);
+
+    HRESULT StartNewConnectionWizard (
+        [in] HWND hwndParent,
+        [out] INetConnection** ppCon);
+};
+
